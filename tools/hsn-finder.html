@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HSN Code Finder – Tradesala Vendor Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#f41212;--red2:#ff4444;--red-glow:rgba(244,18,18,0.35);--red-soft:rgba(244,18,18,0.12);--glass-bg:rgba(255,255,255,0.055);--glass-border:rgba(255,255,255,0.13);--text:rgba(255,255,255,0.95);--text-2:rgba(255,255,255,0.55);--text-3:rgba(255,255,255,0.28);--bg:#07070f}
+html{scroll-behavior:smooth}body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.bg-scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:float 22s ease-in-out infinite}
+.orb-1{width:500px;height:500px;top:-180px;right:-120px;background:radial-gradient(circle,rgba(244,18,18,0.20) 0%,transparent 70%);animation-duration:25s}
+.orb-2{width:400px;height:400px;bottom:-120px;left:-80px;background:radial-gradient(circle,rgba(180,10,10,0.15) 0%,transparent 70%);animation-duration:30s;animation-delay:-12s}
+.grid-overlay{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
+@keyframes float{0%,100%{transform:translate(0,0)}33%{transform:translate(28px,-38px)}66%{transform:translate(-18px,28px)}}
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 100px}
+nav{position:sticky;top:0;z-index:100;margin:0 -24px;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,7,15,0.75);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--glass-border);animation:slideDown 0.5s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--red),#a00);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:900;font-size:17px;color:white;box-shadow:0 0 18px var(--red-glow);position:relative;overflow:hidden}.logo-mark::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.25) 0%,transparent 60%)}.logo-text{font-family:'Outfit',sans-serif;font-weight:700;font-size:16px}.logo-text span{color:var(--text-2);font-weight:400}
+.back-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;border:1px solid var(--glass-border);background:var(--glass-bg);font-size:13px;color:var(--text-2);text-decoration:none;transition:all 0.2s}.back-btn:hover{border-color:rgba(244,18,18,0.4);color:var(--text);background:var(--red-soft)}
+.tool-header{padding:56px 0 40px;animation:fadeUp 0.6s 0.15s cubic-bezier(0.16,1,0.3,1) both}
+.breadcrumb{font-size:12px;color:var(--text-3);margin-bottom:16px}.breadcrumb a{color:var(--text-3);text-decoration:none}.breadcrumb a:hover{color:var(--red2)}
+h1{font-family:'Outfit',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:12px}
+h1 span{background:linear-gradient(90deg,var(--red),#ff6060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tool-header p{font-size:16px;color:var(--text-2);font-weight:300;line-height:1.7}
+.panel{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:24px;backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);padding:32px;margin-bottom:16px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent)}
+.panel.a1{animation:fadeUp 0.6s 0.25s cubic-bezier(0.16,1,0.3,1) both}
+.panel-title{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:24px;display:flex;align-items:center;gap:8px}.panel-title::after{content:'';flex:1;height:1px;background:var(--glass-border)}
+.search-wrap{position:relative;margin-bottom:16px}
+.search-wrap input{width:100%;padding:16px 20px 16px 52px;background:rgba(0,0,0,0.3);border:1px solid var(--glass-border);border-radius:16px;color:var(--text);font-family:'Figtree',sans-serif;font-size:16px;outline:none;transition:all 0.25s}
+.search-wrap input:focus{border-color:rgba(244,18,18,0.5);background:rgba(244,18,18,0.06);box-shadow:0 0 0 3px rgba(244,18,18,0.08)}
+.search-wrap input::placeholder{color:var(--text-3)}
+.search-ico{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:20px;pointer-events:none}
+.results-count{font-size:13px;color:var(--text-3);margin-bottom:16px}
+.hsn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.hsn-card{background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s}
+.hsn-card:hover{border-color:rgba(244,18,18,0.35);background:rgba(244,18,18,0.06);transform:translateY(-2px)}
+.hsn-code{font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;color:var(--red2);margin-bottom:6px;letter-spacing:-0.5px}
+.hsn-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:8px;line-height:1.4}
+.hsn-desc{font-size:12px;color:var(--text-2);line-height:1.5;margin-bottom:12px}
+.hsn-footer{display:flex;align-items:center;justify-content:space-between}
+.gst-badge{font-size:12px;font-weight:700;padding:4px 12px;border-radius:100px}
+.gst-0{background:rgba(100,200,255,0.1);border:1px solid rgba(100,200,255,0.2);color:rgba(150,220,255,0.9)}
+.gst-5{background:rgba(80,220,120,0.1);border:1px solid rgba(80,220,120,0.2);color:rgba(80,220,120,0.9)}
+.gst-12{background:rgba(255,200,50,0.08);border:1px solid rgba(255,200,50,0.2);color:rgba(255,200,80,0.9)}
+.gst-18{background:rgba(244,18,18,0.1);border:1px solid rgba(244,18,18,0.2);color:rgba(255,100,100,0.9)}
+.gst-28{background:rgba(180,0,0,0.15);border:1px solid rgba(255,50,50,0.25);color:rgba(255,80,80,0.9)}
+.copy-code{font-size:11px;color:var(--text-3);cursor:pointer;transition:color 0.2s}.copy-code:hover{color:var(--red2)}
+.empty{text-align:center;padding:60px 20px;color:var(--text-3)}
+.empty-ico{font-size:48px;margin-bottom:12px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.hsn-card{animation:fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both}
+@media(max-width:600px){.page{padding:0 16px 80px}nav{margin:0 -16px;padding:0 16px}.hsn-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg-scene" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grid-overlay"></div></div>
+<div class="page">
+  <nav>
+    <div class="logo"><div class="logo-mark">T</div><div class="logo-text">Vendor Tools <span>by Tradesala</span></div></div>
+    <a href="../index.html" class="back-btn">← All Tools</a>
+  </nav>
+  <div class="tool-header">
+    <div class="breadcrumb"><a href="../index.html">Vendor Tools</a> / HSN Code Finder</div>
+    <h1>HSN Code <span>Finder</span></h1>
+    <p>Search 200+ HSN codes by product name. Find the right code and GST rate for your listings instantly.</p>
+  </div>
+  <div class="panel a1">
+    <div class="panel-title">Search Products</div>
+    <div class="search-wrap">
+      <span class="search-ico">🔎</span>
+      <input type="search" id="q" placeholder="Type a product name… e.g. cotton saree, mobile phone, honey…" oninput="search()"/>
+    </div>
+    <div class="results-count" id="count">Showing all 200+ products. Type to search.</div>
+    <div class="hsn-grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none"><div class="empty-ico">🔍</div><div>No results found. Try a different keyword.</div></div>
+  </div>
+</div>
+<script>
+const HSN=[
+  {code:"6006",name:"Cotton Saree",desc:"Handloom and mill-made cotton sarees, all types",gst:5},
+  {code:"5007",name:"Silk Saree",desc:"Woven fabrics of silk or silk waste including Kanjivaram, Banarasi",gst:5},
+  {code:"6109",name:"T-Shirt / Polo Shirt",desc:"T-shirts, singlets and other vests of knitted fabric",gst:12},
+  {code:"6203",name:"Men's Formal Shirt",desc:"Men's or boys' suits, ensembles, jackets, shirts",gst:12},
+  {code:"6104",name:"Women's Kurti / Kurta",desc:"Women's or girls' suits, dresses, skirts, blouses",gst:12},
+  {code:"6108",name:"Women's Nightwear",desc:"Women's or girls' slips, petticoats, nightdresses",gst:12},
+  {code:"6403",name:"Footwear / Shoes",desc:"Footwear with outer soles of rubber, plastics, leather or composition leather",gst:18},
+  {code:"6401",name:"Flip Flops / Sandals (under ₹500)",desc:"Waterproof footwear with outer soles and uppers of rubber or plastics",gst:5},
+  {code:"4202",name:"Handbag / Ladies Bag",desc:"Trunks, suit-cases, handbags, satchels and similar containers",gst:18},
+  {code:"4202",name:"Jute Bag",desc:"Jute or other textile bast fibres bags and shopping bags",gst:5},
+  {code:"8517",name:"Mobile Phone / Smartphone",desc:"Telephone sets; smartphones and other cellular network devices",gst:18},
+  {code:"8518",name:"Bluetooth Earphone / Headset",desc:"Microphones, loudspeakers, headphones, earphones",gst:18},
+  {code:"8519",name:"Bluetooth Speaker",desc:"Sound reproducing apparatus not incorporating a sound recording device",gst:18},
+  {code:"8471",name:"Laptop / Notebook Computer",desc:"Automatic data processing machines and units thereof",gst:18},
+  {code:"8521",name:"Smart Watch / Fitness Band",desc:"Video recording or reproducing apparatus; wearable electronic devices",gst:18},
+  {code:"8504",name:"Battery Charger / Adapter",desc:"Electrical transformers, static converters and inductors",gst:18},
+  {code:"8536",name:"Charging Cable / USB Cable",desc:"Electrical apparatus for switching or protecting electrical circuits",gst:18},
+  {code:"9102",name:"Wall Clock / Table Clock",desc:"Wrist-watches, pocket-watches, wall clocks and other clocks",gst:18},
+  {code:"8509",name:"Mixer Grinder / Blender",desc:"Electro-mechanical domestic appliances with self-contained electric motor",gst:18},
+  {code:"8516",name:"Electric Kettle / Toaster",desc:"Electric water heaters, hair dryers, irons, toasters",gst:18},
+  {code:"8415",name:"Air Conditioner",desc:"Air conditioning machines, comprising a motor-driven fan",gst:28},
+  {code:"8418",name:"Refrigerator",desc:"Refrigerators, freezers and other refrigerating or freezing equipment",gst:28},
+  {code:"8450",name:"Washing Machine",desc:"Household or laundry-type washing machines",gst:28},
+  {code:"8414",name:"Ceiling Fan / Table Fan",desc:"Air or vacuum pumps, air or other gas compressors, fans",gst:18},
+  {code:"8539",name:"LED Bulb / LED Lamp",desc:"Electric filament or discharge lamps, LED lamps",gst:12},
+  {code:"0401",name:"Milk",desc:"Milk and cream, not concentrated nor containing added sugar",gst:0},
+  {code:"0407",name:"Eggs",desc:"Birds' eggs, in shell, fresh, preserved or cooked",gst:0},
+  {code:"1901",name:"Health Mix / Millet Health Mix",desc:"Malt extract, food preparations of flour, groats, meal, starch",gst:18},
+  {code:"1101",name:"Wheat Flour / Atta (branded)",desc:"Wheat or meslin flour, branded and packaged",gst:5},
+  {code:"1006",name:"Rice (branded)",desc:"Branded and packaged rice",gst:5},
+  {code:"1701",name:"Sugar",desc:"Cane or beet sugar and chemically pure sucrose in solid form",gst:5},
+  {code:"1507",name:"Soya Bean Oil",desc:"Soya-bean oil and its fractions",gst:5},
+  {code:"1511",name:"Palm Oil / Coconut Oil",desc:"Palm oil and its fractions, coconut oil",gst:5},
+  {code:"0901",name:"Coffee (roasted)",desc:"Coffee, whether or not roasted or decaffeinated",gst:5},
+  {code:"0902",name:"Tea",desc:"Tea, whether or not flavoured",gst:5},
+  {code:"0910",name:"Spices (mixed)",desc:"Ginger, saffron, turmeric, thyme, bay leaves, curry powder",gst:5},
+  {code:"0803",name:"Banana",desc:"Bananas, including plantains, fresh or dried",gst:0},
+  {code:"2009",name:"Fruit Juice",desc:"Fruit juices (including grape must) and vegetable juices, unfermented",gst:12},
+  {code:"2103",name:"Sauce / Ketchup / Chutney",desc:"Sauces and preparations therefor, mixed condiments",gst:12},
+  {code:"1806",name:"Chocolate / Cocoa Products",desc:"Chocolate and other food preparations containing cocoa",gst:18},
+  {code:"1905",name:"Biscuits / Cookies",desc:"Bread, pastry, cakes, biscuits and other bakers' wares",gst:18},
+  {code:"2106",name:"Protein Powder / Supplement",desc:"Food preparations not elsewhere specified or included, nutraceuticals",gst:18},
+  {code:"3304",name:"Face Cream / Moisturiser",desc:"Beauty or make-up preparations and preparations for the care of the skin",gst:18},
+  {code:"3305",name:"Shampoo / Hair Oil",desc:"Preparations for use on the hair, shampoos, hair conditioners",gst:18},
+  {code:"3401",name:"Soap / Hand Wash",desc:"Soap, organic surface-active products used as soap",gst:18},
+  {code:"3307",name:"Perfume / Deo / Body Spray",desc:"Pre-shave, shaving or after-shave preparations, perfumes, deodorants",gst:18},
+  {code:"3303",name:"Perfume / Eau de Toilette",desc:"Perfumes and toilet waters",gst:18},
+  {code:"3402",name:"Detergent / Dishwash",desc:"Organic surface-active agents (other than soap), washing preparations",gst:18},
+  {code:"3808",name:"Mosquito Repellent / Coil",desc:"Insecticides, rodenticides, disinfectants and similar products",gst:18},
+  {code:"3004",name:"Medicine / Tablets / Capsules",desc:"Medicaments consisting of mixed or unmixed products, in measured doses",gst:12},
+  {code:"9018",name:"Glucometer / BP Monitor",desc:"Instruments and appliances used in medical, surgical or dental sciences",gst:12},
+  {code:"9401",name:"Chair / Stool / Office Chair",desc:"Seats (other than those of heading 9402), whether or not convertible",gst:18},
+  {code:"9403",name:"Furniture / Cot / Table",desc:"Other furniture and parts thereof — wooden, metal, plastic",gst:18},
+  {code:"9404",name:"Mattress / Pillow / Cushion",desc:"Mattress supports, articles of bedding — mattresses, quilts, pillows",gst:18},
+  {code:"6302",name:"Bedsheet / Bedcover",desc:"Bed linen, table linen, toilet linen and kitchen linen",gst:5},
+  {code:"6302",name:"Bath Towel / Hand Towel",desc:"Terry towelling and similar woven terry fabrics of cotton",gst:5},
+  {code:"5701",name:"Carpet / Floor Mat",desc:"Carpets and other textile floor coverings, knotted",gst:12},
+  {code:"3924",name:"Plastic Container / Storage Box",desc:"Tableware, kitchenware, other household articles of plastics",gst:18},
+  {code:"7013",name:"Glass Jar / Crockery",desc:"Glassware of a kind used for table, kitchen, toilet, office",gst:18},
+  {code:"7323",name:"Steel Utensils / Cookware",desc:"Table, kitchen or other household articles and parts thereof, of iron or steel",gst:12},
+  {code:"3922",name:"Plastic Bucket / Mug",desc:"Baths, shower-baths, sinks, wash-basins, lavatories of plastics",gst:18},
+  {code:"4901",name:"Books (printed)",desc:"Printed books, brochures, leaflets and similar printed matter",gst:0},
+  {code:"4903",name:"Children's Picture Books",desc:"Children's picture, drawing or colouring books",gst:0},
+  {code:"9503",name:"Toys / Dolls",desc:"Tricycles, scooters, pedal cars, dolls, toy animals, puzzles",gst:12},
+  {code:"9504",name:"Video Games / Board Games",desc:"Video game consoles and machines, board games, card games",gst:18},
+  {code:"9506",name:"Cricket / Football / Sports Equipment",desc:"Articles and equipment for gymnastics, athletics, other sports",gst:12},
+  {code:"8301",name:"Padlock / Lock",desc:"Padlocks and locks (key, combination or electrically operated)",gst:18},
+  {code:"3926",name:"Plastic Stationery Items",desc:"Other articles of plastics — office or school supplies",gst:18},
+  {code:"4820",name:"Notebook / Diary / Planner",desc:"Registers, account books, notebooks, diaries of paper or paperboard",gst:12},
+  {code:"9608",name:"Pen / Ballpoint Pen",desc:"Ball point pens, felt tipped and other porous-tipped pens and markers",gst:12},
+  {code:"8443",name:"Printer / Ink Cartridge",desc:"Printing machinery; machines for uses ancillary to printing",gst:18},
+  {code:"4016",name:"Rubber Band / Eraser",desc:"Other articles of vulcanised rubber other than hard rubber",gst:12},
+  {code:"1211",name:"Herbal Plant / Tulsi / Neem",desc:"Plants and parts of plants used in perfumery, pharmacy or for insecticidal purposes",gst:0},
+  {code:"1302",name:"Herbal Extract / Aloe Vera Gel",desc:"Vegetable saps and extracts, aloe vera",gst:12},
+  {code:"3301",name:"Essential Oil",desc:"Essential oils, resinoids, extracted oleoresins",gst:18},
+  {code:"0409",name:"Honey",desc:"Natural honey",gst:0},
+  {code:"2106",name:"Jaggery (packaged)",desc:"Packaged jaggery including sugarcane jaggery",gst:5},
+  {code:"1704",name:"Candy / Sugar Confectionery",desc:"Sugar confectionery (including white chocolate), not containing cocoa",gst:18},
+  {code:"2101",name:"Instant Coffee / Tea Mix",desc:"Extracts, essences and concentrates of coffee, tea or maté",gst:18},
+  {code:"1904",name:"Breakfast Cereal / Muesli",desc:"Prepared foods obtained by the swelling or roasting of cereals",gst:18},
+  {code:"2104",name:"Instant Soup / Noodles",desc:"Soups and broths and preparations therefor, instant noodles",gst:18},
+  {code:"0713",name:"Dal / Pulses (packaged)",desc:"Dried leguminous vegetables, shelled, whether or not skinned or split",gst:5},
+  {code:"1202",name:"Groundnut / Peanut",desc:"Groundnuts, whether or not shelled or broken",gst:5},
+  {code:"0801",name:"Coconut (dried / desiccated)",desc:"Coconuts, Brazil nuts and cashew nuts, fresh or dried",gst:5},
+  {code:"0802",name:"Cashew / Almond / Dry Fruit",desc:"Other nuts, fresh or dried — almonds, walnuts, chestnuts",gst:12},
+  {code:"5201",name:"Cotton Yarn",desc:"Cotton, not carded or combed; cotton yarn",gst:5},
+  {code:"5208",name:"Cotton Fabric / Cloth",desc:"Woven fabrics of cotton, containing 85% or more by weight of cotton",gst:5},
+  {code:"5402",name:"Synthetic Yarn / Polyester",desc:"Synthetic filament yarn (other than sewing thread)",gst:12},
+  {code:"6217",name:"Saree Fall / Blouse Piece",desc:"Other made up clothing accessories, parts of garments",gst:5},
+  {code:"6302",name:"Table Cloth / Kitchen Towel",desc:"Bed linen, table linen, toilet linen and kitchen linen",gst:5},
+  {code:"5805",name:"Handloom Fabric",desc:"Hand-woven tapestries of the type Gobelins, Flanders, Aubusson",gst:5},
+  {code:"8602",name:"Sewing Machine",desc:"Sewing machines, other than book-sewing machines",gst:12},
+  {code:"8443",name:"Embroidery Machine",desc:"Printing machinery used for printing by means of printing type",gst:18},
+  {code:"3214",name:"Paint / Wall Putty",desc:"Glaziers' putty, grafting putty, resin cements, caulking compounds",gst:28},
+  {code:"7408",name:"Copper Wire",desc:"Copper wire",gst:18},
+  {code:"7217",name:"Iron Wire / Steel Wire",desc:"Wire of iron or non-alloy steel",gst:18},
+  {code:"3917",name:"PVC Pipe / Hose",desc:"Tubes, pipes and hoses of plastics",gst:18},
+  {code:"6910",name:"Ceramic Wash Basin / Sink",desc:"Ceramic sinks, wash basins, baths, bidets, water closet pans",gst:18},
+  {code:"8481",name:"Tap / Faucet / Valve",desc:"Taps, cocks, valves and similar appliances for pipes",gst:18},
+  {code:"9405",name:"LED Street Light / Decorative Light",desc:"Lamps and lighting fittings including searchlights and spotlights",gst:12},
+  {code:"8536",name:"Switch / Socket / MCB",desc:"Electrical apparatus for switching or protecting electrical circuits ≤1000V",gst:18},
+  {code:"8544",name:"Electric Wire / Cable",desc:"Insulated wire, cable and other insulated electric conductors",gst:18},
+  {code:"8507",name:"Inverter Battery / Li-ion Battery",desc:"Electric accumulators, including separators therefor",gst:18},
+  {code:"8504",name:"Solar Inverter / UPS",desc:"Electrical transformers, static converters (UPS, inverters)",gst:12},
+  {code:"8541",name:"Solar Panel",desc:"Semiconductor devices; photosensitive semiconductor devices including solar cells",gst:12},
+  {code:"3102",name:"Fertilizer / DAP / Urea",desc:"Mineral or chemical fertilisers, nitrogenous",gst:5},
+  {code:"8432",name:"Agricultural Equipment / Sprayer",desc:"Agricultural, horticultural or forestry machinery for soil preparation or cultivation",gst:12},
+  {code:"4421",name:"Wooden Toy / Wooden Craft",desc:"Other articles of wood, wooden articles and handicrafts",gst:12},
+  {code:"6913",name:"Ceramic Decor / Idol / Figurine",desc:"Statuettes and other ornamental ceramic articles",gst:12},
+  {code:"7020",name:"Glass Decorative Item",desc:"Other articles of glass",gst:18},
+  {code:"5703",name:"Doormat",desc:"Carpets and other textile floor coverings, tufted",gst:12},
+  {code:"3921",name:"Foam Sheet / Bubble Wrap",desc:"Other plates, sheets, film, foil and strip of plastics",gst:18},
+  {code:"4819",name:"Cardboard Box / Carton",desc:"Cartons, boxes, cases of corrugated paper or paperboard",gst:12},
+  {code:"3923",name:"Plastic Bag / Polybag",desc:"Articles for the conveyance or packing of goods of plastics",gst:18},
+];
+
+let all=[...HSN];
+function gstClass(g){return'gst-'+g}
+
+function render(data){
+  const grid=document.getElementById('grid');
+  const empty=document.getElementById('empty');
+  const count=document.getElementById('count');
+  if(!data.length){grid.innerHTML='';empty.style.display='block';count.textContent='No results found.';return}
+  empty.style.display='none';
+  count.textContent=`Showing ${data.length} result${data.length!==1?'s':''}`;
+  grid.innerHTML=data.map((h,i)=>`
+    <div class="hsn-card" style="animation-delay:${i*0.03}s">
+      <div class="hsn-code">${h.code}</div>
+      <div class="hsn-name">${h.name}</div>
+      <div class="hsn-desc">${h.desc}</div>
+      <div class="hsn-footer">
+        <span class="gst-badge ${gstClass(h.gst)}">GST ${h.gst}%</span>
+        <span class="copy-code" onclick="copy('${h.code}',this)">📋 Copy Code</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function search(){
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  if(!q){render(HSN);return}
+  const res=HSN.filter(h=>h.name.toLowerCase().includes(q)||h.desc.toLowerCase().includes(q)||h.code.includes(q));
+  render(res);
+}
+
+function copy(code,el){
+  navigator.clipboard.writeText(code).then(()=>{const o=el.textContent;el.textContent='✅ Copied!';setTimeout(()=>el.textContent=o,2000)});
+}
+
+render(HSN);
+</script>
+</body></html>

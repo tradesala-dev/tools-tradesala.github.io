@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Return Policy Generator – Tradesala Vendor Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--red:#f41212;--red2:#ff4444;--red-glow:rgba(244,18,18,0.35);--red-soft:rgba(244,18,18,0.12);--glass-bg:rgba(255,255,255,0.055);--glass-border:rgba(255,255,255,0.13);--text:rgba(255,255,255,0.95);--text-2:rgba(255,255,255,0.55);--text-3:rgba(255,255,255,0.28);--bg:#07070f}
+html{scroll-behavior:smooth}body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.bg-scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:float 22s ease-in-out infinite}
+.orb-1{width:500px;height:500px;top:-180px;right:-120px;background:radial-gradient(circle,rgba(244,18,18,0.20) 0%,transparent 70%);animation-duration:25s}
+.orb-2{width:400px;height:400px;bottom:-120px;left:-80px;background:radial-gradient(circle,rgba(180,10,10,0.15) 0%,transparent 70%);animation-duration:30s;animation-delay:-12s}
+.grid-overlay{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
+@keyframes float{0%,100%{transform:translate(0,0)}33%{transform:translate(28px,-38px)}66%{transform:translate(-18px,28px)}}
+.page{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:0 24px 100px}
+nav{position:sticky;top:0;z-index:100;margin:0 -24px;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,7,15,0.75);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--glass-border);animation:slideDown 0.5s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--red),#a00);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:900;font-size:17px;color:white;box-shadow:0 0 18px var(--red-glow);position:relative;overflow:hidden}.logo-mark::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.25) 0%,transparent 60%)}.logo-text{font-family:'Outfit',sans-serif;font-weight:700;font-size:16px}.logo-text span{color:var(--text-2);font-weight:400}
+.back-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;border:1px solid var(--glass-border);background:var(--glass-bg);font-size:13px;color:var(--text-2);text-decoration:none;transition:all 0.2s}.back-btn:hover{border-color:rgba(244,18,18,0.4);color:var(--text);background:var(--red-soft)}
+.tool-header{padding:56px 0 40px;animation:fadeUp 0.6s 0.15s cubic-bezier(0.16,1,0.3,1) both}
+.breadcrumb{font-size:12px;color:var(--text-3);margin-bottom:16px}.breadcrumb a{color:var(--text-3);text-decoration:none}.breadcrumb a:hover{color:var(--red2)}
+h1{font-family:'Outfit',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:12px}
+h1 span{background:linear-gradient(90deg,var(--red),#ff6060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.tool-header p{font-size:16px;color:var(--text-2);font-weight:300;line-height:1.7}
+.panel{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:24px;backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);padding:32px;margin-bottom:16px;position:relative;overflow:hidden}
+.panel::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent)}
+.panel.a1{animation:fadeUp 0.6s 0.25s cubic-bezier(0.16,1,0.3,1) both}.panel.a2{animation:fadeUp 0.6s 0.35s cubic-bezier(0.16,1,0.3,1) both}
+.panel-title{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:24px;display:flex;align-items:center;gap:8px}.panel-title::after{content:'';flex:1;height:1px;background:var(--glass-border)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.fg{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}.fg label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3)}
+input[type=text],select{width:100%;padding:13px 14px;background:rgba(0,0,0,0.25);border:1px solid var(--glass-border);border-radius:14px;color:var(--text);font-family:'Figtree',sans-serif;font-size:15px;outline:none;transition:all 0.25s}
+input:focus,select:focus{border-color:rgba(244,18,18,0.5);background:rgba(244,18,18,0.06);box-shadow:0 0 0 3px rgba(244,18,18,0.08)}
+input::placeholder{color:var(--text-3)}
+select option{background:#1a1a2e}
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.check-item{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1px solid var(--glass-border);background:rgba(0,0,0,0.15);cursor:pointer;transition:all 0.2s}
+.check-item:hover{border-color:rgba(244,18,18,0.3);background:rgba(244,18,18,0.06)}
+.check-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--red);cursor:pointer}
+.check-item label{font-size:13px;cursor:pointer;line-height:1.3}
+.btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--red),#c40e0e);border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:white;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(244,18,18,0.35)}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18) 0%,transparent 50%)}.btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(244,18,18,0.45)}.btn:active{transform:translateY(0)}
+#output{display:none}#output.show{display:block;animation:rIn 0.4s cubic-bezier(0.16,1,0.3,1) both}
+.policy-box{background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:16px;padding:28px;font-size:14px;line-height:1.9;color:rgba(255,255,255,0.8);white-space:pre-wrap;font-family:'Figtree',sans-serif;margin-bottom:16px;max-height:400px;overflow-y:auto}
+.action-row{display:flex;gap:12px;flex-wrap:wrap}
+.act-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-family:'Figtree',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;border:1px solid}
+.act-copy{background:rgba(22,200,90,0.10);border-color:rgba(22,200,90,0.22);color:rgba(80,220,120,0.9)}.act-copy:hover{background:rgba(22,200,90,0.18)}
+.act-dl{background:rgba(100,150,255,0.08);border-color:rgba(100,150,255,0.2);color:rgba(150,180,255,0.9)}.act-dl:hover{background:rgba(100,150,255,0.15)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rIn{from{opacity:0;transform:scale(0.97) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@media(max-width:600px){.page{padding:0 16px 80px}nav{margin:0 -16px;padding:0 16px}.form-grid,.check-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg-scene" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grid-overlay"></div></div>
+<div class="page">
+  <nav>
+    <div class="logo"><div class="logo-mark">T</div><div class="logo-text">Vendor Tools <span>by Tradesala</span></div></div>
+    <a href="../index.html" class="back-btn">← All Tools</a>
+  </nav>
+  <div class="tool-header">
+    <div class="breadcrumb"><a href="../index.html">Vendor Tools</a> / Return Policy Generator</div>
+    <h1>Return Policy <span>Generator</span></h1>
+    <p>Create a professional, customised return & refund policy for your Tradesala store in seconds.</p>
+  </div>
+  <div class="panel a1">
+    <div class="panel-title">Your Business Details</div>
+    <div class="form-grid">
+      <div class="fg"><label>Business / Brand Name</label><input type="text" id="bname" placeholder="e.g. Riya Fashion Store"/></div>
+      <div class="fg"><label>Return Window (days)</label>
+        <select id="rdays"><option value="7">7 days</option><option value="10">10 days</option><option value="15" selected>15 days</option><option value="30">30 days</option></select>
+      </div>
+      <div class="fg"><label>Replacement or Refund?</label>
+        <select id="rtype"><option value="both">Both (Replacement & Refund)</option><option value="replace">Replacement Only</option><option value="refund">Refund Only</option></select>
+      </div>
+      <div class="fg"><label>Refund Method</label>
+        <select id="rmethod"><option value="original">Original Payment Method</option><option value="store">Store Credit / Wallet</option><option value="bank">Bank Transfer (NEFT)</option></select>
+      </div>
+      <div class="fg"><label>Contact Email</label><input type="text" id="email" placeholder="support@yourbrand.com"/></div>
+      <div class="fg"><label>Contact Phone</label><input type="text" id="phone" placeholder="9876543210"/></div>
+    </div>
+    <div class="panel-title" style="margin-top:8px">What is eligible for return?</div>
+    <div class="check-grid">
+      <div class="check-item"><input type="checkbox" id="c1" checked/><label for="c1">Damaged / defective product</label></div>
+      <div class="check-item"><input type="checkbox" id="c2" checked/><label for="c2">Wrong item delivered</label></div>
+      <div class="check-item"><input type="checkbox" id="c3"/><label for="c3">Size / fit issue (apparel)</label></div>
+      <div class="check-item"><input type="checkbox" id="c4"/><label for="c4">Change of mind</label></div>
+      <div class="check-item"><input type="checkbox" id="c5" checked/><label for="c5">Missing accessories / parts</label></div>
+      <div class="check-item"><input type="checkbox" id="c6"/><label for="c6">Product not as described</label></div>
+    </div>
+    <button class="btn" onclick="generate()">Generate Policy →</button>
+  </div>
+  <div class="panel a2" id="output">
+    <div class="panel-title">Your Return Policy</div>
+    <div class="policy-box" id="policy-text"></div>
+    <div class="action-row">
+      <button class="act-btn act-copy" onclick="copyPolicy()">📋 Copy Policy</button>
+      <button class="act-btn act-dl" onclick="dlPolicy()">⬇️ Download .txt</button>
+    </div>
+  </div>
+</div>
+<script>
+function generate(){
+  const name=document.getElementById('bname').value.trim()||'Our Store';
+  const days=document.getElementById('rdays').value;
+  const type=document.getElementById('rtype').value;
+  const method=document.getElementById('rmethod').value;
+  const email=document.getElementById('email').value.trim()||'support@tradesala.com';
+  const phone=document.getElementById('phone').value.trim()||'our support team';
+  const c=[1,2,3,4,5,6].filter(n=>document.getElementById('c'+n).checked);
+  const reasons=['damaged or defective product','wrong item delivered','size or fit issue','change of mind','missing accessories or parts','product not as described'];
+  const eligible=c.map(n=>reasons[n-1]);
+  const refundText=type==='both'?'replacement or a full refund':type==='replace'?'a replacement product':'a full refund';
+  const methodText=method==='original'?'the original payment method (credited within 5–7 business days)':method==='store'?'store credit / wallet (instant)':'bank transfer via NEFT (credited within 3–5 business days)';
+  const policy=`RETURN & REFUND POLICY
+${name}
+Last Updated: ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}
+
+──────────────────────────────────────────
+
+OVERVIEW
+At ${name}, we are committed to providing high-quality products. If you are not completely satisfied with your purchase, we are here to help.
+
+RETURN WINDOW
+You have ${days} days from the date of delivery to initiate a return.
+
+ELIGIBLE REASONS FOR RETURN
+We accept returns for the following reasons:
+${eligible.map(r=>`  • ${r.charAt(0).toUpperCase()+r.slice(1)}`).join('\n')}
+
+NON-RETURNABLE ITEMS
+The following items are not eligible for return:
+  • Items returned after ${days} days of delivery
+  • Items that have been used, washed, or altered
+  • Items without original packaging and tags
+  • Perishable goods (food, consumables)
+  • Customised / personalised products
+  • Intimate wear and inner garments (for hygiene reasons)
+
+RETURN PROCESS
+1. Contact us within ${days} days of delivery at ${email} or call/WhatsApp ${phone}
+2. Share your Order ID and photos / video of the issue
+3. Our team will review your request within 24–48 hours
+4. Upon approval, a pickup will be arranged or you may be asked to ship the item back
+5. Once we receive and inspect the returned item, you will receive ${refundText}
+
+REFUND POLICY
+Approved refunds will be processed to ${methodText}.
+  • Refund will be for the product amount only
+  • Shipping charges are non-refundable unless the return is due to our error
+
+EXCHANGE / REPLACEMENT
+If you received a defective or wrong item, we will send a replacement at no additional cost, subject to availability.
+
+CONTACT US
+📧 Email: ${email}
+📞 Phone / WhatsApp: ${phone}
+🕐 Support Hours: Monday to Saturday, 10 AM – 6 PM IST
+
+──────────────────────────────────────────
+This policy is governed by the laws of India. Any disputes are subject to the jurisdiction of courts in Chennai, Tamil Nadu.
+`;
+  document.getElementById('policy-text').textContent=policy;
+  const out=document.getElementById('output');
+  out.classList.remove('show');void out.offsetWidth;out.classList.add('show');
+  out.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function copyPolicy(){
+  const t=document.getElementById('policy-text').textContent;
+  navigator.clipboard.writeText(t).then(()=>{const b=document.querySelector('.act-copy');const o=b.innerHTML;b.innerHTML='✅ Copied!';setTimeout(()=>b.innerHTML=o,2000)});
+}
+function dlPolicy(){
+  const t=document.getElementById('policy-text').textContent;
+  const a=document.createElement('a');
+  a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(t);
+  a.download='return-policy.txt';a.click();
+}
+</script>
+</body></html>
