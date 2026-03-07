@@ -2,191 +2,926 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Image Resizer & Compressor – Tradesala Vendor Tools</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<title>Image Resizer & Approval Checker – Tradesala Vendor Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Figtree:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--red:#f41212;--red2:#ff4444;--red-glow:rgba(244,18,18,0.35);--red-soft:rgba(244,18,18,0.12);--glass-bg:rgba(255,255,255,0.055);--glass-border:rgba(255,255,255,0.13);--text:rgba(255,255,255,0.95);--text-2:rgba(255,255,255,0.55);--text-3:rgba(255,255,255,0.28);--bg:#07070f}
-html{scroll-behavior:smooth}body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+:root{
+  --red:#f41212;--red2:#ff4444;--red-glow:rgba(244,18,18,0.35);--red-soft:rgba(244,18,18,0.12);
+  --glass-bg:rgba(255,255,255,0.055);--glass-border:rgba(255,255,255,0.13);
+  --text:rgba(255,255,255,0.95);--text-2:rgba(255,255,255,0.55);--text-3:rgba(255,255,255,0.28);--bg:#07070f;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Figtree',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .bg-scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
 .orb{position:absolute;border-radius:50%;filter:blur(90px);animation:float 22s ease-in-out infinite}
 .orb-1{width:500px;height:500px;top:-180px;right:-120px;background:radial-gradient(circle,rgba(244,18,18,0.20) 0%,transparent 70%);animation-duration:25s}
 .orb-2{width:400px;height:400px;bottom:-120px;left:-80px;background:radial-gradient(circle,rgba(180,10,10,0.15) 0%,transparent 70%);animation-duration:30s;animation-delay:-12s}
 .grid-overlay{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%)}
 @keyframes float{0%,100%{transform:translate(0,0)}33%{transform:translate(28px,-38px)}66%{transform:translate(-18px,28px)}}
-.page{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:0 24px 100px}
-nav{position:sticky;top:0;z-index:100;margin:0 -24px;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,7,15,0.75);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--glass-border);animation:slideDown 0.5s cubic-bezier(0.16,1,0.3,1) both}
+.page{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 24px 100px}
+nav{position:sticky;top:0;z-index:100;margin:0 -24px;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,7,15,0.80);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid var(--glass-border);animation:slideDown 0.5s cubic-bezier(0.16,1,0.3,1) both}
 @keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none}.logo-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--red),#a00);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:900;font-size:17px;color:white;box-shadow:0 0 18px var(--red-glow);position:relative;overflow:hidden}.logo-mark::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.25) 0%,transparent 60%)}.logo-text{font-family:'Outfit',sans-serif;font-weight:700;font-size:16px}.logo-text span{color:var(--text-2);font-weight:400}
-.back-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;border:1px solid var(--glass-border);background:var(--glass-bg);font-size:13px;color:var(--text-2);text-decoration:none;transition:all 0.2s}.back-btn:hover{border-color:rgba(244,18,18,0.4);color:var(--text);background:var(--red-soft)}
-.tool-header{padding:56px 0 40px;animation:fadeUp 0.6s 0.15s cubic-bezier(0.16,1,0.3,1) both}
-.breadcrumb{font-size:12px;color:var(--text-3);margin-bottom:16px}.breadcrumb a{color:var(--text-3);text-decoration:none}.breadcrumb a:hover{color:var(--red2)}
-h1{font-family:'Outfit',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:12px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-text{font-family:'Outfit',sans-serif;font-weight:700;font-size:16px}.logo-text span{color:var(--text-2);font-weight:400}
+.back-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;border:1px solid var(--glass-border);background:var(--glass-bg);font-size:13px;color:var(--text-2);text-decoration:none;transition:all 0.2s}
+.back-btn:hover{border-color:rgba(244,18,18,0.4);color:var(--text);background:var(--red-soft)}
+.tool-header{padding:52px 0 36px;animation:fadeUp 0.6s 0.15s cubic-bezier(0.16,1,0.3,1) both}
+.breadcrumb{font-size:12px;color:var(--text-3);margin-bottom:14px}.breadcrumb a{color:var(--text-3);text-decoration:none}.breadcrumb a:hover{color:var(--red2)}
+h1{font-family:'Outfit',sans-serif;font-size:clamp(30px,5vw,50px);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:12px}
 h1 span{background:linear-gradient(90deg,var(--red),#ff6060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.tool-header p{font-size:16px;color:var(--text-2);font-weight:300;line-height:1.7}
+.tool-header p{font-size:15px;color:var(--text-2);font-weight:300;line-height:1.7}
+.guideline-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;background:rgba(244,18,18,0.08);border:1px solid rgba(244,18,18,0.22);border-radius:100px;font-size:12px;font-weight:700;color:rgba(255,140,140,0.9);margin-bottom:20px;letter-spacing:0.3px}
 .panel{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:24px;backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);padding:32px;margin-bottom:16px;position:relative;overflow:hidden}
 .panel::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent)}
-.panel.a1{animation:fadeUp 0.6s 0.25s cubic-bezier(0.16,1,0.3,1) both}.panel.a2{animation:fadeUp 0.6s 0.35s cubic-bezier(0.16,1,0.3,1) both}
-.panel-title{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:24px;display:flex;align-items:center;gap:8px}.panel-title::after{content:'';flex:1;height:1px;background:var(--glass-border)}
-.drop-zone{border:2px dashed var(--glass-border);border-radius:16px;padding:48px 24px;text-align:center;cursor:pointer;transition:all 0.25s;position:relative}
-.drop-zone:hover,.drop-zone.drag{border-color:rgba(244,18,18,0.5);background:rgba(244,18,18,0.05)}
-.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.drop-ico{font-size:40px;margin-bottom:12px}
+.panel.a1{animation:fadeUp 0.6s 0.2s cubic-bezier(0.16,1,0.3,1) both}
+.panel.a2{animation:fadeUp 0.6s 0.3s cubic-bezier(0.16,1,0.3,1) both}
+.panel-title{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:22px;display:flex;align-items:center;gap:8px}
+.panel-title::after{content:'';flex:1;height:1px;background:var(--glass-border)}
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:rgba(0,0,0,0.3);border-radius:14px;padding:4px;margin-bottom:24px}
+.mode-tab{padding:11px;border-radius:10px;border:none;background:transparent;color:var(--text-2);font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;letter-spacing:-0.3px}
+.mode-tab.active{background:rgba(244,18,18,0.15);border:1px solid rgba(244,18,18,0.3);color:var(--text)}
+.mode-tab:not(.active):hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.drop-zone{border:2px dashed var(--glass-border);border-radius:18px;padding:48px 24px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:rgba(244,18,18,0.5);background:rgba(244,18,18,0.04)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-ico{font-size:44px;margin-bottom:12px;display:block}
 .drop-text{font-size:16px;font-weight:500;color:var(--text-2);margin-bottom:6px}
-.drop-sub{font-size:13px;color:var(--text-3)}
-.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
-.preset{padding:12px;border-radius:12px;border:1px solid var(--glass-border);background:rgba(0,0,0,0.2);cursor:pointer;transition:all 0.2s;text-align:center}
-.preset:hover{border-color:rgba(244,18,18,0.35);background:rgba(244,18,18,0.07)}
-.preset.active{border-color:rgba(244,18,18,0.5);background:rgba(244,18,18,0.12)}
-.preset-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
-.preset-size{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--text-2)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.fg{display:flex;flex-direction:column;gap:8px}.fg label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3)}
-input[type=number],select{width:100%;padding:12px 14px;background:rgba(0,0,0,0.25);border:1px solid var(--glass-border);border-radius:14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;outline:none;transition:all 0.25s;-moz-appearance:textfield}
+.drop-sub{font-size:13px;color:var(--text-3);line-height:1.6}
+.drop-name{font-size:13px;color:rgba(80,220,120,0.85);margin-top:10px;font-weight:600}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.fg{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.fg label{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3)}
+input[type=number],select{width:100%;padding:12px 14px;background:rgba(0,0,0,0.25);border:1px solid var(--glass-border);border-radius:12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;outline:none;transition:all 0.2s;-moz-appearance:textfield}
 input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 input:focus,select:focus{border-color:rgba(244,18,18,0.5);background:rgba(244,18,18,0.06);box-shadow:0 0 0 3px rgba(244,18,18,0.08)}
 select option{background:#1a1a2e}
-.quality-wrap{margin-bottom:20px}
-.quality-row{display:flex;align-items:center;gap:16px}
+.quality-row{display:flex;align-items:center;gap:12px}
 input[type=range]{flex:1;accent-color:var(--red);cursor:pointer}
-.quality-val{font-family:'Outfit',sans-serif;font-weight:800;font-size:20px;color:var(--red2);min-width:40px}
-.btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--red),#c40e0e);border:none;border-radius:14px;font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:white;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(244,18,18,0.35)}
-.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18) 0%,transparent 50%)}.btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(244,18,18,0.45)}.btn:active{transform:translateY(0)}
-#output{display:none}#output.show{display:block;animation:rIn 0.4s cubic-bezier(0.16,1,0.3,1) both}
-.preview-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.prev-box{border-radius:14px;overflow:hidden;border:1px solid var(--glass-border);background:rgba(0,0,0,0.2)}
-.prev-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);padding:10px 14px;border-bottom:1px solid var(--glass-border)}
-.prev-box img{width:100%;height:180px;object-fit:contain;padding:8px;background:rgba(255,255,255,0.03)}
-.prev-info{padding:10px 14px;font-size:12px;color:var(--text-2)}
-.r3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.r-box{background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);border-radius:14px;padding:16px;text-align:center}
-.r-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
-.r-val{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800}
-.dl-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:rgba(22,200,90,0.10);border:1px solid rgba(22,200,90,0.22);border-radius:12px;color:rgba(80,220,120,0.9);font-family:'Figtree',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}.dl-btn:hover{background:rgba(22,200,90,0.18)}
+.qval{font-family:'Outfit',sans-serif;font-weight:800;font-size:18px;color:var(--red2);min-width:44px;text-align:right}
+.rule-alert{background:rgba(255,200,60,0.06);border:1px solid rgba(255,200,60,0.18);border-radius:12px;padding:12px 16px;font-size:13px;color:rgba(255,220,100,0.9);line-height:1.6;margin-bottom:16px}
+.rule-alert strong{color:rgba(255,230,120,0.95)}
+.btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--red),#c40e0e);border:none;border-radius:13px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:white;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(244,18,18,0.35);margin-top:8px}
+.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.18) 0%,transparent 50%)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(244,18,18,0.45)}.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+#single-output{display:none}
+#single-output.show{display:block;animation:rIn 0.5s cubic-bezier(0.16,1,0.3,1) both}
+.preview-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.prev-box{border-radius:14px;overflow:hidden;border:1px solid var(--glass-border)}
+.prev-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);padding:9px 14px;border-bottom:1px solid var(--glass-border);background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:space-between}
+.prev-badge{font-size:10px;padding:2px 8px;border-radius:100px;font-weight:700;letter-spacing:0.5px}
+.badge-ok{background:rgba(22,200,90,0.12);border:1px solid rgba(22,200,90,0.2);color:rgba(80,220,120,0.9)}
+.prev-img-wrap{background:#fff;background-image:linear-gradient(45deg,#e8e8e8 25%,transparent 25%),linear-gradient(-45deg,#e8e8e8 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e8e8e8 75%),linear-gradient(-45deg,transparent 75%,#e8e8e8 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0;padding:10px;display:flex;align-items:center;justify-content:center;min-height:210px}
+.prev-img-wrap img{max-width:100%;max-height:250px;object-fit:contain;display:block;image-rendering:auto;image-rendering:-webkit-optimize-contrast}
+.prev-info{padding:9px 14px;font-size:12px;color:var(--text-2);background:rgba(0,0,0,0.15);line-height:1.5}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stat-box{background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);border-radius:13px;padding:14px;text-align:center}
+.stat-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:5px}
+.stat-val{font-family:'Outfit',sans-serif;font-size:18px;font-weight:800}
+.c-green{color:rgba(80,220,120,0.9)}.c-yellow{color:rgba(255,200,60,0.9)}.c-red{color:rgba(255,100,100,0.9)}.c-blue{color:rgba(100,180,255,0.9)}
+.scorecard{background:rgba(0,0,0,0.25);border:1px solid var(--glass-border);border-radius:22px;overflow:hidden;margin-bottom:14px}
+.sc-header{display:flex;align-items:center;justify-content:space-between;padding:22px 26px;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.02);gap:16px;flex-wrap:wrap}
+.sc-title-block .sc-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:3px}
+.sc-title-block .sc-sub{font-size:12px;color:var(--text-3)}
+.overall-ring{position:relative;width:86px;height:86px;flex-shrink:0}
+.overall-ring svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:8}
+.ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1);stroke-dasharray:220;stroke-dashoffset:220}
+.overall-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.overall-num{font-family:'Outfit',sans-serif;font-size:21px;font-weight:900;line-height:1;letter-spacing:-1px}
+.overall-word{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-top:3px}
+.sc-body{padding:2px 0}
+.crit-row{padding:16px 26px;border-bottom:1px solid rgba(255,255,255,0.04);display:grid;grid-template-columns:26px 1fr 60px;align-items:start;gap:14px}
+.crit-row:last-child{border-bottom:none}
+.crit-icon{font-size:18px;margin-top:2px}
+.crit-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.crit-desc{font-size:12px;color:var(--text-3);line-height:1.5;margin-bottom:9px}
+.m-track{height:7px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden}
+.m-fill{height:100%;border-radius:100px;width:0%;transition:width 1.3s cubic-bezier(0.16,1,0.3,1)}
+.ticks{display:flex;justify-content:space-between;margin-top:4px}
+.tick{font-size:9px;color:var(--text-3);font-family:'Outfit',sans-serif;font-weight:600}
+.crit-pct{font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;letter-spacing:-1px;text-align:right;padding-top:2px;transition:color 0.5s}
+.tips-section{padding:0 26px 18px;display:flex;flex-wrap:wrap;gap:8px}
+.tip{font-size:11px;padding:5px 12px;border-radius:100px;font-weight:700;border:1px solid}
+.tip-pass{background:rgba(22,200,90,0.07);border-color:rgba(22,200,90,0.2);color:rgba(80,220,120,0.9)}
+.tip-warn{background:rgba(255,200,60,0.07);border-color:rgba(255,200,60,0.18);color:rgba(255,210,60,0.9)}
+.tip-fail{background:rgba(244,18,18,0.07);border-color:rgba(244,18,18,0.2);color:rgba(255,100,100,0.9)}
+.verdict{margin:0 26px 22px;padding:16px 20px;border-radius:14px;display:flex;align-items:flex-start;gap:12px;border:1px solid}
+.verdict-ico{font-size:24px;flex-shrink:0;margin-top:1px}
+.verdict-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;margin-bottom:4px}
+.verdict-text{font-size:13px;line-height:1.65;color:var(--text-2)}
+.dl-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;background:rgba(22,200,90,0.10);border:1px solid rgba(22,200,90,0.22);border-radius:12px;color:rgba(80,220,120,0.9);font-family:'Figtree',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.dl-btn:hover{background:rgba(22,200,90,0.18)}
+/* Bulk */
+#bulk-mode{display:none}
+.bulk-drop{border:2px dashed var(--glass-border);border-radius:18px;padding:52px 24px;text-align:center;cursor:pointer;transition:all 0.3s;position:relative}
+.bulk-drop:hover,.bulk-drop.drag{border-color:rgba(244,18,18,0.5);background:rgba(244,18,18,0.04)}
+.bulk-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.progress-wrap{display:none;margin-bottom:16px}
+.progress-wrap.show{display:block}
+.progress-bar-track{height:8px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;margin-bottom:8px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--red),#ff4444);border-radius:100px;transition:width 0.2s;width:0%}
+.progress-text{font-size:13px;color:var(--text-2);text-align:center}
+.bulk-results{display:none;margin-top:16px}
+.bulk-results.show{display:block;animation:rIn 0.4s cubic-bezier(0.16,1,0.3,1) both}
+.bulk-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.bsum-box{background:rgba(0,0,0,0.2);border:1px solid var(--glass-border);border-radius:13px;padding:14px;text-align:center}
+.bsum-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-3);margin-bottom:5px}
+.bsum-val{font-family:'Outfit',sans-serif;font-size:22px;font-weight:900}
+.results-table-wrap{background:rgba(0,0,0,0.18);border:1px solid var(--glass-border);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.results-table{width:100%;border-collapse:collapse}
+.results-table th{padding:11px 16px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3);background:rgba(255,255,255,0.025);border-bottom:1px solid rgba(255,255,255,0.06);text-align:left}
+.results-table td{padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.results-table tr:last-child td{border-bottom:none}
+.results-table tr:hover td{background:rgba(255,255,255,0.02)}
+.img-thumb{width:40px;height:40px;object-fit:cover;border-radius:7px;border:1px solid var(--glass-border)}
+.file-name{font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.file-meta{font-size:11px;color:var(--text-3);margin-top:2px}
+.score-pill{font-family:'Outfit',sans-serif;font-weight:900;font-size:14px;padding:4px 10px;border-radius:8px;display:inline-block}
+.pill-pass{background:rgba(22,200,90,0.1);color:rgba(80,220,120,0.9)}
+.pill-warn{background:rgba(255,200,60,0.1);color:rgba(255,210,60,0.9)}
+.pill-fail{background:rgba(244,18,18,0.1);color:rgba(255,100,100,0.9)}
+.status-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;border:1px solid;display:inline-flex;align-items:center;gap:5px}
+.status-approved{background:rgba(22,200,90,0.08);border-color:rgba(22,200,90,0.2);color:rgba(80,220,120,0.9)}
+.status-review{background:rgba(255,200,60,0.08);border-color:rgba(255,200,60,0.18);color:rgba(255,210,60,0.9)}
+.status-rejected{background:rgba(244,18,18,0.08);border-color:rgba(244,18,18,0.2);color:rgba(255,100,100,0.9)}
+.issues-cell{font-size:11px;color:var(--text-3);line-height:1.6;max-width:200px}
+.bulk-dl-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:rgba(100,180,255,0.08);border:1px solid rgba(100,180,255,0.18);border-radius:12px;color:rgba(130,190,255,0.9);font-family:'Figtree',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn-secondary:hover{background:rgba(100,180,255,0.15)}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-@keyframes rIn{from{opacity:0;transform:scale(0.97) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@media(max-width:600px){.page{padding:0 16px 80px}nav{margin:0 -16px;padding:0 16px}.form-row{grid-template-columns:1fr}.preview-wrap{grid-template-columns:1fr}.r3{grid-template-columns:1fr 1fr}.r3 .r-box:last-child{grid-column:span 2}}
+@keyframes rIn{from{opacity:0;transform:scale(0.97) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@media(max-width:640px){
+  .page{padding:0 16px 80px}nav{margin:0 -16px;padding:0 16px}
+  .form-row{grid-template-columns:1fr}
+  .preview-wrap{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr 1fr}
+  .bulk-summary{grid-template-columns:1fr 1fr}
+  .crit-row{grid-template-columns:22px 1fr 48px}
+  .sc-header{flex-direction:column;align-items:flex-start}
+  .results-table th:nth-child(4),.results-table td:nth-child(4){display:none}
+}
 </style>
 </head>
 <body>
 <div class="bg-scene" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="grid-overlay"></div></div>
 <div class="page">
+
   <nav>
-    <div class="logo"><div class="logo-mark">T</div><div class="logo-text">Vendor Tools <span>by Tradesala</span></div></div>
+    <div class="logo">
+      <img src="https://tradesala.com/assets/images/logo.svg" alt="Tradesala" style="width:34px;height:34px;border-radius:9px;object-fit:contain;background:white;padding:4px;box-shadow:0 0 18px rgba(244,18,18,0.35)"/>
+      <div class="logo-text">Vendor Tools <span>by Tradesala</span></div>
+    </div>
     <a href="../index.html" class="back-btn">← All Tools</a>
   </nav>
+
   <div class="tool-header">
     <div class="breadcrumb"><a href="../index.html">Vendor Tools</a> / Image Resizer</div>
-    <h1>Image Resizer &amp; <span>Compressor</span></h1>
-    <p>Resize and compress product images to marketplace standards. All processing happens in your browser — no upload to any server.</p>
+    <div class="guideline-badge">📋 Based on official Tradesala Image Guidelines v1.0.1</div>
+    <h1>Image Resizer &amp; <span>Approval Checker</span></h1>
+    <p>Resize product images to Tradesala standards — then get a strict 8-point approval score based on the official guidelines. Supports single images and bulk processing up to 100 at once.</p>
   </div>
+
+  <!-- PANEL -->
   <div class="panel a1">
-    <div class="panel-title">Upload Image</div>
-    <div class="drop-zone" id="dropZone">
-      <input type="file" id="fileInput" accept="image/*" onchange="loadFile(event)"/>
-      <div class="drop-ico">🖼️</div>
-      <div class="drop-text">Drop image here or click to browse</div>
-      <div class="drop-sub">JPG, PNG, WebP — up to 20MB</div>
+    <div class="panel-title">Mode</div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="switchMode('single')">🖼️ Single Image</button>
+      <button class="mode-tab" onclick="switchMode('bulk')">📦 Bulk Resize (up to 100)</button>
+    </div>
+
+    <!-- SINGLE MODE -->
+    <div id="single-mode">
+      <div class="panel-title">Upload Image</div>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="image/*" onchange="loadSingle(event)"/>
+        <span class="drop-ico">🖼️</span>
+        <div class="drop-text">Drop your product image or click to browse</div>
+        <div class="drop-sub">Accepts any image format (JPG, PNG, WebP, HEIC, etc.) · All processing done locally in your browser</div>
+        <div class="drop-name" id="drop-name"></div>
+      </div>
+
+      <div id="single-settings" style="display:none;margin-top:20px">
+        <div class="panel-title">Output Settings</div>
+        <div class="rule-alert">
+          <strong>ℹ️ Tradesala guidelines:</strong> Input can be any image format. Output can be <strong>JPEG, PNG or WebP</strong> — all accepted by Tradesala. Recommended dimensions are <strong>1000×1000 px</strong>. Max file size is <strong>5 MB</strong>. Min resolution is <strong>80 PPI</strong>.
+        </div>
+        <div class="form-row">
+          <div class="fg" style="margin-bottom:0"><label>Width (px)</label><input type="number" id="w" value="1000" min="100" max="5000"/></div>
+          <div class="fg" style="margin-bottom:0"><label>Height (px)</label><input type="number" id="h" value="1000" min="100" max="5000"/></div>
+        </div>
+        <div class="fg" style="margin-top:14px">
+          <label>Output Format <span style="color:rgba(140,200,140,0.8);font-size:10px;text-transform:none;letter-spacing:0;font-weight:600">(JPEG, PNG and WebP all accepted by Tradesala)</span></label>
+          <select id="fmt" onchange="updateFmtNote()">
+            <option value="image/jpeg" selected>JPEG ✅ — Recommended · Smallest file size</option>
+            <option value="image/png">PNG ✅ — Accepted · Lossless, larger files</option>
+            <option value="image/webp">WebP ✅ — Accepted · Best compression + quality</option>
+          </select>
+          <div id="fmt-note" style="font-size:11px;color:var(--text-3);margin-top:6px">JPEG is the recommended format for Tradesala — best compatibility and smallest file size.</div>
+        </div>
+        <div class="fg">
+          <label>Quality — <span id="qval">88</span>% <span style="font-size:10px;color:var(--text-3);text-transform:none;letter-spacing:0;font-weight:400">(80–92% recommended)</span></label>
+          <div class="quality-row">
+            <input type="range" id="quality" min="10" max="100" value="88" oninput="syncQ(this.value)"/>
+            <span class="qval" id="qval2">88%</span>
+          </div>
+        </div>
+        <button class="btn" id="processBtn" onclick="processSingle()">Resize &amp; Check Approval →</button>
+      </div>
+    </div>
+
+    <!-- BULK MODE -->
+    <div id="bulk-mode">
+      <div class="panel-title">Upload Images (max 100)</div>
+      <div class="bulk-drop" id="bulkDrop">
+        <input type="file" id="bulkInput" accept="image/*" multiple onchange="loadBulk(event)"/>
+        <span class="drop-ico">📦</span>
+        <div class="drop-text">Drop up to 100 images or click to browse</div>
+        <div class="drop-sub">Accepts any image format · Processed entirely in your browser · Max 5 MB each</div>
+        <div class="drop-name" id="bulk-name"></div>
+      </div>
+      <div id="bulk-settings-row" style="display:none;margin-top:16px">
+        <div class="form-row">
+          <div class="fg" style="margin-bottom:0"><label>Output Width (px)</label><input type="number" id="bw" value="1000" min="400" max="3000"/></div>
+          <div class="fg" style="margin-bottom:0"><label>Output Height (px)</label><input type="number" id="bh" value="1000" min="400" max="3000"/></div>
+        </div>
+        <div class="fg" style="margin-top:12px">
+          <label>Output Format</label>
+          <select id="bfmt">
+            <option value="image/jpeg" selected>JPEG ✅ — Recommended</option>
+            <option value="image/png">PNG ✅ — Accepted</option>
+            <option value="image/webp">WebP ✅ — Accepted</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Quality — <span id="bqval">88</span>%</label>
+          <div class="quality-row">
+            <input type="range" id="bquality" min="50" max="100" value="88" oninput="document.getElementById('bqval').textContent=this.value;document.getElementById('bqval2').textContent=this.value+'%'"/>
+            <span class="qval" id="bqval2">88%</span>
+          </div>
+        </div>
+      </div>
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+        <div class="progress-text" id="progress-text">Processing…</div>
+      </div>
+      <button class="btn" id="bulkBtn" onclick="processBulk()" style="display:none">Process &amp; Analyse All →</button>
     </div>
   </div>
-  <div class="panel a1" id="settings-panel" style="display:none">
-    <div class="panel-title">Marketplace Presets</div>
-    <div class="presets">
-      <div class="preset active" onclick="setPreset(800,800,this)"><div class="preset-name">Tradesala</div><div class="preset-size">800×800</div></div>
-      <div class="preset" onclick="setPreset(1000,1000,this)"><div class="preset-name">Amazon</div><div class="preset-size">1000×1000</div></div>
-      <div class="preset" onclick="setPreset(900,900,this)"><div class="preset-name">Flipkart</div><div class="preset-size">900×900</div></div>
-      <div class="preset" onclick="setPreset(1080,1080,this)"><div class="preset-name">Instagram</div><div class="preset-size">1080×1080</div></div>
-      <div class="preset" onclick="setPreset(1200,628,this)"><div class="preset-name">Facebook Ad</div><div class="preset-size">1200×628</div></div>
-      <div class="preset" onclick="setPreset(0,0,this)"><div class="preset-name">Custom</div><div class="preset-size">Manual</div></div>
+
+  <!-- SINGLE OUTPUT -->
+  <div id="single-output">
+    <div class="panel a2">
+      <div class="panel-title">Before &amp; After</div>
+      <div class="preview-wrap">
+        <div class="prev-box">
+          <div class="prev-label">Original <span class="prev-badge badge-ok" id="orig-badge">–</span></div>
+          <div class="prev-img-wrap"><img id="orig-prev" src="" alt="original"/></div>
+          <div class="prev-info" id="orig-info"></div>
+        </div>
+        <div class="prev-box">
+          <div class="prev-label">Processed <span class="prev-badge badge-ok" id="proc-badge">–</span></div>
+          <div class="prev-img-wrap"><img id="proc-prev" src="" alt="processed"/></div>
+          <div class="prev-info" id="proc-info"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><div class="stat-label">Size Saved</div><div class="stat-val" id="r_saved">–</div></div>
+        <div class="stat-box"><div class="stat-label">Dimensions</div><div class="stat-val" id="r_dims">–</div></div>
+        <div class="stat-box"><div class="stat-label">Output Size</div><div class="stat-val" id="r_size">–</div></div>
+        <div class="stat-box"><div class="stat-label">Est. PPI</div><div class="stat-val" id="r_ppi">–</div></div>
+      </div>
+      <button class="dl-btn" onclick="downloadSingle()">⬇️ Download Image</button>
     </div>
-    <div class="form-row">
-      <div class="fg"><label>Width (px)</label><input type="number" id="w" value="800" oninput="updateAspect('w')"/></div>
-      <div class="fg"><label>Height (px)</label><input type="number" id="h" value="800" oninput="updateAspect('h')"/></div>
+
+    <!-- SCORECARD -->
+    <div class="scorecard">
+      <div class="sc-header">
+        <div class="sc-title-block">
+          <div class="sc-title">Tradesala Approval Score</div>
+          <div class="sc-sub">7 criteria · Based on official Tradesala Image Guidelines v1.0.1</div>
+        </div>
+        <div class="overall-ring">
+          <svg width="86" height="86" viewBox="0 0 86 86">
+            <circle class="ring-bg" cx="43" cy="43" r="35"/>
+            <circle class="ring-fill" id="ring-fill" cx="43" cy="43" r="35"/>
+          </svg>
+          <div class="overall-inner">
+            <div class="overall-num" id="overall-num">–</div>
+            <div class="overall-word" id="overall-word">Score</div>
+          </div>
+        </div>
+      </div>
+      <div class="sc-body" id="sc-body"></div>
+      <div class="tips-section" id="tips-section"></div>
+      <div class="verdict" id="verdict"></div>
     </div>
-    <div class="fg" style="margin-bottom:16px"><label>Output Format</label>
-      <select id="fmt"><option value="image/jpeg">JPEG (smaller file)</option><option value="image/png">PNG (transparent support)</option><option value="image/webp">WebP (best compression)</option></select>
-    </div>
-    <div class="quality-wrap">
-      <div class="fg"><label>Quality — <span id="qval">85</span>%</label></div>
-      <div class="quality-row"><input type="range" id="quality" min="10" max="100" value="85" oninput="document.getElementById('qval').textContent=this.value"/><span class="quality-val" id="qval2">85%</span></div>
-    </div>
-    <button class="btn" onclick="process()">Resize & Compress →</button>
   </div>
-  <div class="panel a2" id="output">
-    <div class="panel-title">Result</div>
-    <div class="preview-wrap">
-      <div class="prev-box"><div class="prev-label">Original</div><img id="orig-prev" src="" alt="original"/><div class="prev-info" id="orig-info"></div></div>
-      <div class="prev-box"><div class="prev-label">Processed</div><img id="proc-prev" src="" alt="processed"/><div class="prev-info" id="proc-info"></div></div>
+
+  <!-- BULK OUTPUT -->
+  <div class="bulk-results" id="bulk-results">
+    <div class="panel" style="padding:24px 28px">
+      <div class="panel-title">Batch Results</div>
+      <div class="bulk-summary">
+        <div class="bsum-box"><div class="bsum-label">Total</div><div class="bsum-val" id="b_total">0</div></div>
+        <div class="bsum-box"><div class="bsum-label">✅ Approved</div><div class="bsum-val c-green" id="b_approved">0</div></div>
+        <div class="bsum-box"><div class="bsum-label">⚠️ Review</div><div class="bsum-val c-yellow" id="b_review">0</div></div>
+        <div class="bsum-box"><div class="bsum-label">❌ Rejected</div><div class="bsum-val c-red" id="b_rejected">0</div></div>
+      </div>
+      <div class="results-table-wrap">
+        <table class="results-table">
+          <thead><tr><th>Image</th><th>File</th><th>Score</th><th>Issues</th><th>Status</th></tr></thead>
+          <tbody id="bulk-tbody"></tbody>
+        </table>
+      </div>
+      <div class="bulk-dl-row">
+        <button class="dl-btn" id="dl-all-btn" onclick="downloadAllZip()">⬇️ Download All (ZIP)</button>
+        <button class="btn-secondary" onclick="downloadApprovedZip()">✅ Download Approved Only (ZIP)</button>
+      </div>
     </div>
-    <div class="r3">
-      <div class="r-box"><div class="r-label">Size Reduction</div><div class="r-val" id="r_reduction" style="color:rgba(80,220,120,0.9)">0%</div></div>
-      <div class="r-box"><div class="r-label">New Dimensions</div><div class="r-val" id="r_dims">0×0</div></div>
-      <div class="r-box"><div class="r-label">New File Size</div><div class="r-val" id="r_size">0 KB</div></div>
-    </div>
-    <button class="dl-btn" onclick="download()">⬇️ Download Image</button>
   </div>
+
 </div>
+
 <script>
-let origFile=null,origSize=0,processedBlob=null;
-const dz=document.getElementById('dropZone');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
-dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
-dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){loadFileObj(f)}});
-function loadFile(e){const f=e.target.files[0];if(f)loadFileObj(f)}
-function loadFileObj(f){origFile=f;origSize=f.size;document.getElementById('settings-panel').style.display='block';document.getElementById('drop-text')&&(document.getElementById('dropZone').querySelector('.drop-text').textContent='✅ '+f.name);}
-function setPreset(w,h,el){document.querySelectorAll('.preset').forEach(p=>p.classList.remove('active'));el.classList.add('active');if(w&&h){document.getElementById('w').value=w;document.getElementById('h').value=h}}
-let aspectW=1,aspectH=1;
-function updateAspect(changed){/* allow free resize */}
-function process(){
-  if(!origFile){alert('Please upload an image first.');return}
-  const w=+document.getElementById('w').value||800;
-  const h=+document.getElementById('h').value||800;
-  const fmt=document.getElementById('fmt').value;
-  const q=+document.getElementById('quality').value/100;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=new Image();
-    img.onload=()=>{
-      const canvas=document.createElement('canvas');
-      canvas.width=w;canvas.height=h;
-      const ctx=canvas.getContext('2d');
-      ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h);
-      // fit-contain
-      const scale=Math.min(w/img.width,h/img.height);
-      const nw=img.width*scale,nh=img.height*scale;
-      ctx.drawImage(img,(w-nw)/2,(h-nh)/2,nw,nh);
-      canvas.toBlob(blob=>{
-        processedBlob=blob;
-        const url=URL.createObjectURL(blob);
-        document.getElementById('orig-prev').src=e.target.result;
-        document.getElementById('proc-prev').src=url;
-        document.getElementById('orig-info').textContent=`${img.width}×${img.height}  |  ${kb(origSize)}`;
-        document.getElementById('proc-info').textContent=`${w}×${h}  |  ${kb(blob.size)}`;
-        const red=Math.round((1-blob.size/origSize)*100);
-        document.getElementById('r_reduction').textContent=(red>0?'-':'')+Math.abs(red)+'%';
-        document.getElementById('r_dims').textContent=`${w}×${h}`;
-        document.getElementById('r_size').textContent=kb(blob.size);
-        const out=document.getElementById('output');
-        out.classList.remove('show');void out.offsetWidth;out.classList.add('show');
-        out.scrollIntoView({behavior:'smooth',block:'center'});
-      },fmt,q);
+// ─────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────
+let origFile = null, origSize = 0, processedBlob = null, processedFmt = 'image/jpeg';
+let bulkFiles = [], bulkBlobs = [];
+
+// ─────────────────────────────────────────
+//  MODE SWITCH
+// ─────────────────────────────────────────
+function switchMode(m) {
+  document.querySelectorAll('.mode-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&m==='single')||(i===1&&m==='bulk')));
+  document.getElementById('single-mode').style.display = m==='single' ? 'block' : 'none';
+  document.getElementById('bulk-mode').style.display   = m==='bulk'   ? 'block' : 'none';
+  document.getElementById('single-output').style.display = 'none';
+  document.getElementById('single-output').classList.remove('show');
+  document.getElementById('bulk-results').style.display = 'none';
+  document.getElementById('bulk-results').classList.remove('show');
+}
+
+// ─────────────────────────────────────────
+//  FORMAT NOTE
+// ─────────────────────────────────────────
+const FMT_NOTES = {
+  'image/jpeg': 'JPEG is the recommended format for Tradesala — best compatibility and smallest file size.',
+  'image/png':  'PNG is accepted by Tradesala. Larger file sizes than JPEG — ensure output stays under 5 MB.',
+  'image/webp': 'WebP is accepted by Tradesala. Excellent compression and quality balance.'
+};
+function updateFmtNote() {
+  const fmt = document.getElementById('fmt').value;
+  document.getElementById('fmt-note').textContent = FMT_NOTES[fmt] || '';
+}
+
+// ─────────────────────────────────────────
+//  DROP & LOAD — SINGLE
+// ─────────────────────────────────────────
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) loadSingleFile(f);
+});
+function loadSingle(e) { const f = e.target.files[0]; if (f) loadSingleFile(f); }
+function loadSingleFile(f) {
+  origFile = f; origSize = f.size;
+  document.getElementById('drop-name').textContent = '✅  ' + f.name + ' (' + kb(f.size) + ')';
+  document.getElementById('single-settings').style.display = 'block';
+  setTimeout(() => document.getElementById('single-settings').scrollIntoView({ behavior:'smooth', block:'nearest' }), 100);
+}
+
+// ─────────────────────────────────────────
+//  DROP & LOAD — BULK
+// ─────────────────────────────────────────
+const bdz = document.getElementById('bulkDrop');
+bdz.addEventListener('dragover', e => { e.preventDefault(); bdz.classList.add('drag'); });
+bdz.addEventListener('dragleave', () => bdz.classList.remove('drag'));
+bdz.addEventListener('drop', e => { e.preventDefault(); bdz.classList.remove('drag'); loadBulkFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'))); });
+function loadBulk(e) { loadBulkFiles(Array.from(e.target.files)); }
+function loadBulkFiles(files) {
+  bulkFiles = files.slice(0, 100);
+  if (!bulkFiles.length) return;
+  const capped = files.length > 100;
+  document.getElementById('bulk-name').textContent = '✅  ' + bulkFiles.length + ' image' + (bulkFiles.length > 1 ? 's' : '') + ' selected' + (capped ? ' (capped at 100)' : '');
+  document.getElementById('bulk-settings-row').style.display = 'block';
+  document.getElementById('bulkBtn').style.display = 'block';
+}
+
+function syncQ(v) { document.getElementById('qval').textContent = v; document.getElementById('qval2').textContent = v + '%'; }
+
+// ─────────────────────────────────────────
+//  ANALYSIS: SHARPNESS (Laplacian variance)
+// ─────────────────────────────────────────
+function computeSharpness(ctx, w, h) {
+  const sx = Math.floor(w*0.15), sy = Math.floor(h*0.15), sw = Math.floor(w*0.70), sh = Math.floor(h*0.70);
+  const d = ctx.getImageData(sx, sy, sw, sh).data;
+  const W = sw, H = sh;
+  const g = new Float32Array(W * H);
+  for (let i = 0; i < W*H; i++) { const p=i*4; g[i]=0.299*d[p]+0.587*d[p+1]+0.114*d[p+2]; }
+  let sum = 0, cnt = 0;
+  for (let y=1; y<H-1; y++) for (let x=1; x<W-1; x++) {
+    const l = -g[(y-1)*W+x]-g[(y+1)*W+x]-g[y*W+(x-1)]-g[y*W+(x+1)]+4*g[y*W+x];
+    sum += l*l; cnt++;
+  }
+  const v = cnt > 0 ? sum/cnt : 0;
+  if (v >= 700) return 96; if (v >= 400) return 84; if (v >= 180) return 68;
+  if (v >= 70)  return 48; if (v >= 25)  return 30; return 12;
+}
+
+// ─────────────────────────────────────────
+//  ANALYSIS: BACKGROUND LIGHTNESS (corners)
+// ─────────────────────────────────────────
+function computeBgLightness(ctx, w, h) {
+  const corners = [ctx.getImageData(0,0,12,12), ctx.getImageData(w-12,0,12,12), ctx.getImageData(0,h-12,12,12), ctx.getImageData(w-12,h-12,12,12)];
+  let tL = 0, n = 0;
+  for (const c of corners) for (let i=0; i<c.data.length; i+=4) {
+    const mx = Math.max(c.data[i],c.data[i+1],c.data[i+2])/255;
+    const mn = Math.min(c.data[i],c.data[i+1],c.data[i+2])/255;
+    tL += (mx+mn)/2; n++;
+  }
+  return n ? tL/n : 0;
+}
+
+// ─────────────────────────────────────────
+//  ANALYSIS: PRODUCT COVERAGE
+// ─────────────────────────────────────────
+function computeProductCoverage(ctx, w, h) {
+  const margin=0.05, sx=Math.floor(w*margin), sy=Math.floor(h*margin), sw=Math.floor(w*(1-2*margin)), sh=Math.floor(h*(1-2*margin));
+  const d = ctx.getImageData(sx, sy, sw, sh).data;
+  let nonWhite = 0, total = sw*sh;
+  for (let i=0; i<d.length; i+=4) { if (d[i]<230||d[i+1]<230||d[i+2]<230) nonWhite++; }
+  return total > 0 ? nonWhite/total : 0;
+}
+
+// ─────────────────────────────────────────
+//  SCORE HELPERS
+// ─────────────────────────────────────────
+function scoreColor(s) { return s>=78?'rgba(80,220,120,0.95)':s>=55?'rgba(255,200,60,0.9)':'rgba(255,100,100,0.9)'; }
+function scoreGrad(s)  { return s>=78?'linear-gradient(90deg,#16c85a,#4ade80)':s>=55?'linear-gradient(90deg,#f59e0b,#fcd34d)':'linear-gradient(90deg,#f41212,#ff4444)'; }
+function scoreWord(s)  { return s>=90?'Excellent':s>=78?'Good':s>=60?'Fair':s>=40?'Poor':'Fail'; }
+function kb(b)         { return b>1024*1024?(b/1024/1024).toFixed(2)+' MB':(b/1024).toFixed(1)+' KB'; }
+function fmtExt(fmt)   { return fmt==='image/png'?'png':fmt==='image/webp'?'webp':'jpg'; }
+
+function animMeter(fillId, pctId, score) {
+  const fill=document.getElementById(fillId), pctEl=document.getElementById(pctId);
+  fill.style.background=scoreGrad(score); fill.style.width='0%'; pctEl.textContent='–'; pctEl.style.color='rgba(255,255,255,0.4)';
+  setTimeout(() => {
+    fill.style.width=score+'%';
+    let c=0; const step=score/50;
+    const t=setInterval(() => { c=Math.min(c+step,score); pctEl.textContent=Math.round(c)+'%'; if(c>=score){clearInterval(t);pctEl.style.color=scoreColor(score);} }, 14);
+  }, 100);
+}
+
+function animRing(overall) {
+  const ring=document.getElementById('ring-fill'), numEl=document.getElementById('overall-num'), wordEl=document.getElementById('overall-word');
+  const C = 2*Math.PI*35;
+  ring.style.stroke = scoreColor(overall); ring.style.strokeDashoffset = C;
+  numEl.textContent='–'; numEl.style.color='#fff'; numEl.style.fontSize='21px'; wordEl.textContent='Score';
+  setTimeout(() => {
+    ring.style.strokeDashoffset = C-(overall/100)*C;
+    let c=0; const step=overall/55;
+    const t=setInterval(() => {
+      c=Math.min(c+step,overall); numEl.textContent=Math.round(c)+'%';
+      if (c>=overall) { clearInterval(t); numEl.style.color=scoreColor(overall); wordEl.textContent=scoreWord(overall); wordEl.style.color=scoreColor(overall); }
+    }, 14);
+  }, 120);
+}
+
+// ─────────────────────────────────────────
+//  COMPUTE ALL SCORES
+// ─────────────────────────────────────────
+function computeAllScores({w, h, blobSize, q, sharp, bgL, cover}) {
+  const sizeKB = blobSize / 1024;
+
+  // 1. DIMENSIONS — Recommended 1000×1000
+  let s_dim;
+  if      (w>=1000 && h>=1000) s_dim = 100;
+  else if (w>=900  && h>=900)  s_dim = 88;
+  else if (w>=800  && h>=800)  s_dim = 70;
+  else if (w>=600  && h>=600)  s_dim = 42;
+  else if (w>=400  && h>=400)  s_dim = 22;
+  else                          s_dim = 8;
+  if      (q < 70) s_dim = Math.round(s_dim * 0.65);
+  else if (q < 80) s_dim = Math.round(s_dim * 0.85);
+
+  // 2. ASPECT RATIO — Must be 1:1
+  let s_ratio;
+  if      (w === h)              s_ratio = 100;
+  else { const r = Math.max(w,h)/Math.min(w,h);
+    if      (r <= 1.02) s_ratio = 88;
+    else if (r <= 1.10) s_ratio = 60;
+    else if (r <= 1.33) s_ratio = 34;
+    else if (r <= 1.78) s_ratio = 16;
+    else                s_ratio = 5;
+  }
+
+  // 3. FILE SIZE — Hard max 5 MB
+  let s_size;
+  if      (sizeKB > 5120)  s_size = 0;
+  else if (sizeKB <= 100)  s_size = 100;
+  else if (sizeKB <= 200)  s_size = 92;
+  else if (sizeKB <= 400)  s_size = 78;
+  else if (sizeKB <= 800)  s_size = 60;
+  else if (sizeKB <= 1500) s_size = 40;
+  else if (sizeKB <= 3000) s_size = 22;
+  else                      s_size = 10;
+
+  // 4. SHARPNESS — Laplacian
+  const s_sharp = sharp;
+
+  // 5. BACKGROUND — White required
+  let s_bg;
+  if      (bgL >= 0.95) s_bg = 100;
+  else if (bgL >= 0.88) s_bg = 82;
+  else if (bgL >= 0.78) s_bg = 60;
+  else if (bgL >= 0.65) s_bg = 40;
+  else if (bgL >= 0.45) s_bg = 22;
+  else                   s_bg = 8;
+
+  // 6. PRODUCT COVERAGE — ≥90% of frame
+  let s_cover;
+  if      (cover >= 0.88) s_cover = 100;
+  else if (cover >= 0.75) s_cover = 80;
+  else if (cover >= 0.60) s_cover = 60;
+  else if (cover >= 0.40) s_cover = 38;
+  else if (cover >= 0.20) s_cover = 18;
+  else                     s_cover = 8;
+
+  // 7. OVERALL APPROVAL — weighted composite
+  const s_approval = Math.round(
+    s_dim   * 0.18 +
+    s_ratio * 0.14 +
+    s_size  * 0.14 +
+    s_sharp * 0.18 +
+    s_bg    * 0.18 +
+    s_cover * 0.18
+  );
+
+  return { s_dim, s_ratio, s_size, s_sharp, s_bg, s_cover, s_approval, overall: s_approval };
+}
+
+// ─────────────────────────────────────────
+//  RENDER SCORECARD
+// ─────────────────────────────────────────
+function renderScorecard(scores, { w, h, blobSize, fmt, bgL, cover }) {
+  const { s_dim, s_ratio, s_size, s_sharp, s_bg, s_cover, s_approval, overall } = scores;
+  const sizeKB = blobSize / 1024;
+  const fmtName = fmt.split('/')[1].toUpperCase();
+
+  const criteria = [
+    {
+      icon: '📐', id: 'c1', score: s_dim,
+      name: 'Dimensions & Resolution',
+      desc: w>=1000 && h>=1000
+        ? `${w}×${h}px — meets the recommended 1000×1000px standard. Excellent clarity.`
+        : w>=800 && h>=800
+        ? `${w}×${h}px — meets minimum but 1000×1000px is recommended for optimal quality.`
+        : `${w}×${h}px — below 800×800px minimum. Tradesala recommends 1000×1000px.`
+    },
+    {
+      icon: '⬛', id: 'c2', score: s_ratio,
+      name: 'Aspect Ratio (1:1 Square)',
+      desc: w===h
+        ? `Perfect 1:1 square ratio. Correct for Tradesala product grid display.`
+        : `${w}×${h} is not square. Tradesala requires 1:1 ratio — non-square images appear cropped.`
+    },
+    {
+      icon: '💾', id: 'c3', score: s_size,
+      name: 'File Size',
+      desc: sizeKB > 5120
+        ? `${kb(blobSize)} exceeds the 5 MB hard limit — will be rejected. Reduce quality or dimensions.`
+        : sizeKB <= 200
+        ? `${kb(blobSize)} — ideal. Fast loading, well within the 5 MB limit.`
+        : sizeKB <= 800
+        ? `${kb(blobSize)} — acceptable. Under 200 KB is ideal per guidelines.`
+        : `${kb(blobSize)} — large. Reduce quality or dimensions. Max allowed: 5 MB.`
+    },
+    {
+      icon: '🔬', id: 'c4', score: s_sharp,
+      name: 'Sharpness & Clarity',
+      desc: s_sharp >= 78
+        ? `Image is sharp and well-defined. Product details clearly visible.`
+        : s_sharp >= 50
+        ? `Moderate sharpness. Original may be slightly soft. Tradesala rejects blurry images.`
+        : `Low sharpness detected — image appears blurry. Blurry images are an explicit rejection reason.`
+    },
+    {
+      icon: '🟣', id: 'c5', score: s_bg,
+      name: 'Background (White Recommended)',
+      desc: bgL >= 0.90
+        ? `Clean white/light background detected — meets primary image standard.`
+        : bgL >= 0.75
+        ? `Background appears slightly off-white. Pure white (#ffffff) is recommended for primary images.`
+        : `Dark or busy background detected. Primary images must have a clean white background.`
+    },
+    {
+      icon: '🖼️', id: 'c6', score: s_cover,
+      name: 'Product Coverage (≥90% of Frame)',
+      desc: cover >= 0.75
+        ? `Product fills most of the frame — meets the 90% coverage guideline.`
+        : cover >= 0.45
+        ? `Product coverage is moderate. Tradesala requires the product to cover at least 90% of the frame.`
+        : `Low product coverage — product may be too small or image partial. Risk of rejection.`
+    },
+    {
+      icon: '✅', id: 'c7', score: s_approval,
+      name: 'Overall Approval Likelihood',
+      desc: s_approval >= 85
+        ? `High approval likelihood. Image meets all or most Tradesala guidelines. Ready to upload.`
+        : s_approval >= 65
+        ? `Moderate approval likelihood. Address the yellow/red flags above before uploading.`
+        : s_approval >= 40
+        ? `Low approval likelihood. Multiple guideline violations detected. Significant rework needed.`
+        : `Very high rejection risk. Critical violations found. Fix all red issues before uploading.`
+    }
+  ];
+
+  document.getElementById('sc-body').innerHTML = criteria.map(c => `
+    <div class="crit-row">
+      <div class="crit-icon">${c.icon}</div>
+      <div>
+        <div class="crit-name">${c.name}</div>
+        <div class="crit-desc">${c.desc}</div>
+        <div class="m-track"><div class="m-fill" id="${c.id}-fill"></div></div>
+        <div class="ticks"><span class="tick">0</span><span class="tick">25</span><span class="tick">50</span><span class="tick">75</span><span class="tick">100</span></div>
+      </div>
+      <div class="crit-pct" id="${c.id}-pct">–</div>
+    </div>
+  `).join('');
+
+  setTimeout(() => criteria.forEach(c => animMeter(c.id+'-fill', c.id+'-pct', c.score)), 50);
+  animRing(overall);
+
+  // Tips
+  const tips = [];
+  tips.push({ cls: 'tip-pass', t: `✓ ${fmtName} format — accepted by Tradesala` });
+  if      (w>=1000 && h>=1000) tips.push({ cls: 'tip-pass', t: '✓ 1000×1000px recommended size' });
+  else if (w>=800  && h>=800)  tips.push({ cls: 'tip-warn', t: '⚠ Below recommended 1000×1000px' });
+  else                          tips.push({ cls: 'tip-fail', t: '✗ Below 800×800px minimum' });
+  if (w===h) tips.push({ cls: 'tip-pass', t: '✓ Square 1:1 ratio' });
+  else       tips.push({ cls: 'tip-fail', t: '✗ Non-square — must be 1:1' });
+  if      (sizeKB <= 200)  tips.push({ cls: 'tip-pass', t: '✓ File size ideal' });
+  else if (sizeKB <= 5120) tips.push({ cls: 'tip-warn', t: '⚠ Aim for under 200 KB' });
+  else                      tips.push({ cls: 'tip-fail', t: '✗ Over 5 MB — hard rejected' });
+  if      (s_sharp >= 78) tips.push({ cls: 'tip-pass', t: '✓ Image is sharp' });
+  else if (s_sharp >= 50) tips.push({ cls: 'tip-warn', t: '⚠ Slightly soft/blurry' });
+  else                     tips.push({ cls: 'tip-fail', t: '✗ Blurry — explicit rejection reason' });
+  if      (bgL >= 0.88) tips.push({ cls: 'tip-pass', t: '✓ White background detected' });
+  else if (bgL >= 0.70) tips.push({ cls: 'tip-warn', t: '⚠ Background not pure white' });
+  else                   tips.push({ cls: 'tip-fail', t: '✗ Dark background detected' });
+  if      (cover >= 0.75) tips.push({ cls: 'tip-pass', t: '✓ Product fills frame' });
+  else if (cover >= 0.45) tips.push({ cls: 'tip-warn', t: '⚠ Product coverage < 90%' });
+  else                     tips.push({ cls: 'tip-fail', t: '✗ Product too small in frame' });
+
+  document.getElementById('tips-section').innerHTML = tips.map(t => `<div class="tip ${t.cls}">${t.t}</div>`).join('');
+
+  // Verdict
+  const v = overall >= 85
+    ? { ico:'🏆', bg:'rgba(22,200,90,0.07)',   bc:'rgba(22,200,90,0.2)',   title:'Ready to Upload!',            text:'Your image meets all or most Tradesala image guidelines. Highly likely to pass the product curator review.' }
+    : overall >= 68
+    ? { ico:'👍', bg:'rgba(255,200,60,0.07)',   bc:'rgba(255,200,60,0.2)', title:'Likely to Pass — Minor Issues', text:'Image is acceptable but has room to improve. Review the orange/red points above before uploading.' }
+    : overall >= 45
+    ? { ico:'⚠️', bg:'rgba(255,130,50,0.07)',  bc:'rgba(255,130,50,0.2)', title:'High Risk of Rejection',       text:'Multiple guideline violations detected. Fix the red issues — especially background, sharpness and dimensions.' }
+    : { ico:'❌', bg:'rgba(244,18,18,0.07)',    bc:'rgba(244,18,18,0.25)', title:'Will Be Rejected',             text:'Image fails several criteria. Do not upload in current state. Fix all red flags: minimum 1000×1000px, white background, sharp focus.' };
+
+  const vEl = document.getElementById('verdict');
+  vEl.style.cssText = `background:${v.bg};border-color:${v.bc}`;
+  vEl.innerHTML = `<div class="verdict-ico">${v.ico}</div><div><div class="verdict-title">${v.title}</div><div class="verdict-text">${v.text}</div></div>`;
+}
+
+// ─────────────────────────────────────────
+//  PROCESS SINGLE IMAGE
+// ─────────────────────────────────────────
+function processSingle() {
+  if (!origFile) { alert('Please upload an image first.'); return; }
+  const w   = Math.max(100, Math.min(5000, +document.getElementById('w').value || 1000));
+  const h   = Math.max(100, Math.min(5000, +document.getElementById('h').value || 1000));
+  const fmt = document.getElementById('fmt').value;
+  const q   = +document.getElementById('quality').value / 100;
+
+  const btn = document.getElementById('processBtn');
+  btn.disabled = true; btn.textContent = 'Processing…';
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onerror = () => { btn.disabled=false; btn.textContent='Resize & Check Approval →'; alert('Failed to load image. Please try a different file.'); };
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+      const scale = Math.min(w/img.width, h/img.height);
+      const nw = Math.round(img.width*scale), nh = Math.round(img.height*scale);
+      ctx.drawImage(img, Math.round((w-nw)/2), Math.round((h-nh)/2), nw, nh);
+
+      const sharp = computeSharpness(ctx, w, h);
+      const bgL   = computeBgLightness(ctx, w, h);
+      const cover = computeProductCoverage(ctx, w, h);
+
+      const blobQ = (fmt === 'image/png') ? undefined : q;
+      canvas.toBlob(blob => {
+        if (!blob) { btn.disabled=false; btn.textContent='Resize & Check Approval →'; alert('Could not process image. Try a different format or smaller file.'); return; }
+        processedBlob = blob;
+        processedFmt  = fmt;
+        const url = URL.createObjectURL(blob);
+
+        // Previews
+        document.getElementById('orig-prev').src = e.target.result;
+        document.getElementById('proc-prev').src = url;
+        const origFmtName = (origFile.type || '').split('/')[1]?.toUpperCase() || '?';
+        document.getElementById('orig-badge').textContent = origFmtName;
+        document.getElementById('proc-badge').textContent = fmt.split('/')[1].toUpperCase();
+        document.getElementById('orig-info').innerHTML = `<strong>${img.width}×${img.height}px</strong> · ${kb(origSize)} · ${origFmtName}`;
+        document.getElementById('proc-info').innerHTML = `<strong>${w}×${h}px</strong> · ${kb(blob.size)} · ${fmt.split('/')[1].toUpperCase()}`;
+
+        const reduction = Math.round((1 - blob.size/origSize) * 100);
+        const savedEl = document.getElementById('r_saved');
+        savedEl.textContent = (reduction > 0 ? '–' : '+') + Math.abs(reduction) + '%';
+        savedEl.className   = 'stat-val ' + (reduction > 0 ? 'c-green' : 'c-red');
+        document.getElementById('r_dims').textContent = `${w}×${h}`;
+        document.getElementById('r_size').textContent = kb(blob.size);
+
+        const ppi   = Math.round(w / 10.4);
+        const ppiEl = document.getElementById('r_ppi');
+        ppiEl.textContent = ppi + ' PPI';
+        ppiEl.className   = 'stat-val ' + (ppi>=80?'c-green':ppi>=60?'c-yellow':'c-red');
+
+        const scores = computeAllScores({ w, h, blobSize: blob.size, q: Math.round(q*100), sharp, bgL, cover });
+        renderScorecard(scores, { w, h, blobSize: blob.size, fmt, bgL, cover });
+
+        const out = document.getElementById('single-output');
+        out.style.display = 'block'; out.classList.remove('show'); void out.offsetWidth; out.classList.add('show');
+        setTimeout(() => out.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+
+        btn.disabled = false; btn.textContent = 'Resize & Check Approval →';
+      }, fmt, blobQ);
     };
-    img.src=e.target.result;
+    img.src = e.target.result;
   };
   reader.readAsDataURL(origFile);
 }
-function kb(b){return b>1024*1024?(b/1024/1024).toFixed(2)+' MB':(b/1024).toFixed(1)+' KB'}
-function download(){
-  if(!processedBlob){return}
-  const fmt=document.getElementById('fmt').value;
-  const ext=fmt==='image/png'?'png':fmt==='image/webp'?'webp':'jpg';
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(processedBlob);
-  a.download=`tradesala-product.${ext}`;
+
+function downloadSingle() {
+  if (!processedBlob) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(processedBlob);
+  a.download = 'tradesala-product.' + fmtExt(processedFmt);
   a.click();
 }
-document.getElementById('quality').addEventListener('input',function(){document.getElementById('qval').textContent=this.value;document.getElementById('qval2').textContent=this.value+'%'});
+
+// ─────────────────────────────────────────
+//  PROCESS BULK
+// ─────────────────────────────────────────
+async function processBulk() {
+  if (!bulkFiles.length) { alert('Please select images first.'); return; }
+  const bw   = +document.getElementById('bw').value || 1000;
+  const bh   = +document.getElementById('bh').value || 1000;
+  const bfmt = document.getElementById('bfmt').value;
+  const bq   = +document.getElementById('bquality').value / 100;
+  const ext  = fmtExt(bfmt);
+
+  bulkBlobs = [];
+  const btn = document.getElementById('bulkBtn');
+  btn.disabled = true; btn.textContent = 'Processing…';
+  document.getElementById('progress-wrap').classList.add('show');
+  document.getElementById('bulk-results').style.display = 'none';
+  document.getElementById('bulk-results').classList.remove('show');
+
+  const tbody = document.getElementById('bulk-tbody');
+  tbody.innerHTML = '';
+  let approved = 0, review = 0, rejected = 0;
+
+  for (let i = 0; i < bulkFiles.length; i++) {
+    const f   = bulkFiles[i];
+    const pct = Math.round(((i+1) / bulkFiles.length) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = `Processing ${i+1} of ${bulkFiles.length}: ${f.name}`;
+
+    const result = await processOneFile(f, bw, bh, bfmt, bq);
+    if (!result) {
+      bulkBlobs.push({ name: f.name, blob: new Blob() });
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="5" style="color:rgba(255,100,100,0.7);padding:12px 16px">⚠️ Failed to process: ${f.name}</td>`;
+      tbody.appendChild(tr);
+      rejected++;
+      continue;
+    }
+    bulkBlobs.push({ name: f.name.replace(/\.[^.]+$/, '') + '.' + ext, blob: result.blob });
+
+    const sc      = result.scores;
+    const overall = sc.overall;
+    let status, statusClass;
+    if      (overall >= 75) { status='✅ Approved'; statusClass='status-approved'; approved++; }
+    else if (overall >= 50) { status='⚠️ Review';  statusClass='status-review';   review++;   }
+    else                    { status='❌ Rejected'; statusClass='status-rejected'; rejected++; }
+
+    const pillClass = overall >= 75 ? 'pill-pass' : overall >= 50 ? 'pill-warn' : 'pill-fail';
+    const issues    = buildIssuesList(sc, result);
+    const thumbUrl  = URL.createObjectURL(result.blob);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><img class="img-thumb" src="${thumbUrl}" alt=""/></td>
+      <td><span class="file-name" title="${f.name}">${f.name}</span><span class="file-meta">${kb(f.size)} → ${kb(result.blob.size)}</span></td>
+      <td><span class="score-pill ${pillClass}">${overall}%</span></td>
+      <td class="issues-cell">${issues}</td>
+      <td><span class="status-badge ${statusClass}">${status}</span></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById('b_total').textContent    = bulkFiles.length;
+  document.getElementById('b_approved').textContent = approved;
+  document.getElementById('b_review').textContent   = review;
+  document.getElementById('b_rejected').textContent = rejected;
+
+  const br = document.getElementById('bulk-results');
+  br.style.display = 'block'; br.classList.remove('show'); void br.offsetWidth; br.classList.add('show');
+  setTimeout(() => br.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+
+  btn.disabled = false; btn.textContent = 'Process & Analyse All →';
+  document.getElementById('progress-wrap').classList.remove('show');
+}
+
+function buildIssuesList(sc, result) {
+  const issues = [];
+  if (result.w < 1000 || result.h < 1000) issues.push('Below 1000×1000px');
+  if (result.w !== result.h)               issues.push('Not square');
+  if (result.blob.size / 1024 > 200)       issues.push('File > 200 KB');
+  if (sc.s_sharp < 60)                     issues.push('Blurry image');
+  if (sc.s_bg < 70)                        issues.push('Non-white background');
+  if (sc.s_cover < 50)                     issues.push('Low product coverage');
+  return issues.length ? issues.join(' · ') : '<span style="color:rgba(80,220,120,0.8)">No critical issues</span>';
+}
+
+function processOneFile(file, w, h, fmt, q) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = () => resolve(null);
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+        const scale = Math.min(w/img.width, h/img.height);
+        const nw = Math.round(img.width*scale), nh = Math.round(img.height*scale);
+        ctx.drawImage(img, Math.round((w-nw)/2), Math.round((h-nh)/2), nw, nh);
+
+        const sharp = computeSharpness(ctx, w, h);
+        const bgL   = computeBgLightness(ctx, w, h);
+        const cover = computeProductCoverage(ctx, w, h);
+        const blobQ = (fmt === 'image/png') ? undefined : q;
+
+        canvas.toBlob(blob => {
+          if (!blob) { resolve(null); return; }
+          const scores = computeAllScores({ w, h, blobSize: blob.size, q: Math.round(q*100), sharp, bgL, cover });
+          resolve({ blob, scores, w, h, sharp, bgL, cover });
+        }, fmt, blobQ);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function downloadAllZip() {
+  if (!bulkBlobs.length) return;
+  const btn = document.getElementById('dl-all-btn');
+  btn.textContent = '⏳ Preparing ZIP…'; btn.style.opacity = '0.6';
+  const zip = new JSZip(), folder = zip.folder('tradesala-resized');
+  bulkBlobs.forEach(({ name, blob }) => folder.file(name, blob));
+  const content = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(content); a.download = 'tradesala-images.zip'; a.click();
+  btn.textContent = '⬇️ Download All (ZIP)'; btn.style.opacity = '1';
+}
+
+async function downloadApprovedZip() {
+  const approvedBlobs = [];
+  document.querySelectorAll('#bulk-tbody tr').forEach((tr, i) => {
+    const badge = tr.querySelector('.status-badge');
+    if (badge && badge.classList.contains('status-approved')) approvedBlobs.push(bulkBlobs[i]);
+  });
+  if (!approvedBlobs.length) { alert('No approved images to download.'); return; }
+  const zip = new JSZip(), folder = zip.folder('tradesala-approved');
+  approvedBlobs.forEach(({ name, blob }) => folder.file(name, blob));
+  const content = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(content); a.download = 'tradesala-approved.zip'; a.click();
+}
 </script>
-</body></html>
+</body>
+</html>
