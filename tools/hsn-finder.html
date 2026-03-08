@@ -149,7 +149,7 @@ nav{position:sticky;top:0;z-index:100;margin:0 -24px;padding:0 24px;height:64px;
 .top-disclaimer a:hover{opacity:.8}
 .disc-icon{font-size:16px;flex-shrink:0;margin-top:1px}
 .tool-header{padding:28px 0 32px;animation:fadeUp .6s .15s cubic-bezier(.16,1,.3,1) both}
-.breadcrumb{font-size:12px;color:var(--text-3);margin-bottom:14px}.breadcrumb a{color:var(--text-3);text-decoration:none}.breadcrumb a:hover{color:var(--red2)}
+.breadcrumb{font-size:12px;color:var(--text-3);margin-bottom:14px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.breadcrumb a{color:var(--text-3);text-decoration:none}.breadcrumb a:hover{color:var(--red2)}.breadcrumb .sep{opacity:.4}
 h1{font-family:"Outfit",sans-serif;font-size:clamp(28px,5vw,46px);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:12px}
 h1 span{background:linear-gradient(90deg,var(--red),#ff6060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .tool-header p{font-size:15px;color:var(--text-2);font-weight:300;line-height:1.7}
@@ -259,8 +259,10 @@ h1 span{background:linear-gradient(90deg,var(--red),#ff6060);-webkit-background-
 <div class="page">
   <nav role="navigation" aria-label="Site navigation">
     <div class="logo">
-      <img src="https://tradesala.com/assets/images/logo.svg" alt="Tradesala Logo" width="34" height="34" style="width:34px;height:34px;border-radius:9px;background:white;padding:4px;box-shadow:0 0 18px rgba(244,18,18,.35)"/>
-      <div class="logo-text">Vendor Tools <span>by Tradesala</span></div>
+      <a href="https://tradesala.com" target="_blank" rel="noopener noreferrer" style="text-decoration:none;">
+        <img src="https://play-lh.googleusercontent.com/ThjEPb9ot5r-KBDojyAzkmatXCBrHhs9B4CISXN6L2XXHCuoABKntWDq_2HBnRH3UQ=w480-h960-rw" alt="Tradesala" style="width:34px;height:34px;border-radius:14px;object-fit:contain;background:white;padding:0px;box-shadow:0 0 18px rgba(244,18,18,0.35);display:block;">
+      </a>
+      <div class="logo-text">Toolkit <span>by Tradesala</span></div>
     </div>
     <a href="../index.html" class="back-btn" aria-label="Back to all tools">&#8592; All Tools</a>
   </nav>
@@ -277,7 +279,11 @@ h1 span{background:linear-gradient(90deg,var(--red),#ff6060);-webkit-background-
 
   <header class="tool-header">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="https://tradesala.com">Tradesala</a> &#8250; <a href="../index.html">Vendor Tools</a> &#8250; HSN Code Finder
+      <a href="https://tradesala.com">Tradesala</a>
+      <span class="sep">&#8250;</span>
+      <a href="../index.html">Vendor Tools</a>
+      <span class="sep">&#8250;</span>
+      <span>HSN Code Finder</span>
     </nav>
     <div class="db-badge" aria-label="Database stats">&#9889; 563+ Codes &middot; GST 2.0 Updated &middot; Rates as on 22 Sep 2025 &middot; Offline</div>
     <h1>HSN Code <span>Finder</span> India</h1>
